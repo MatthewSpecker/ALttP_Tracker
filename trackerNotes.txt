@@ -1,0 +1,16 @@
+Menu:
+-Open File
+-Save File
+-Preferences
+-Undo
+-Redo
+-Stream View
+-Help
+-About
+
+Other Things:
+-Standardize image sizes
+-Add chest image and dungon counts
+-Add question mark to prize list (add to settings)
+-Add text to half magic
+-Add Map
