@@ -32,20 +32,16 @@ func almostEqual (a, b float64) bool {
 
 func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoRedoStacks, preferencesConfig *viper.Viper, saveConfig *save.SaveFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) *fyne.MainMenu {
   categoryItem := fyne.NewMenuItem("Category", nil)
-  //otherItem := fyne.NewMenuItem("Other", nil)
-  //mailItem := fyne.NewMenuItem("Mail", func() { fmt.Println("Menu New->Other->Mail") })
-  //mailItem.Icon = theme.MailComposeIcon()
-  //customItem.ChildMenu = fyne.NewMenu("",
-  //  fyne.NewMenuItem("Project", func() { fmt.Println("Menu New->Other->Project") }),
-  //  mailItem,
-  //)
-  defaultCatItem := fyne.NewMenuItem("Default", nil)
+  defaultCatItem := fyne.NewMenuItem("Default", func() {
+    
+  })
   keysanityItem := fyne.NewMenuItem("Keysanity", nil)
   allDungeonsItem := fyne.NewMenuItem("All Dungeons", nil)
   fastGanonItem := fyne.NewMenuItem("Fast Ganon", nil)
   mapCompassBossShuffle := fyne.NewMenuItem("Map/Compass Boss Shuffle", nil)
   masterSwordItem := fyne.NewMenuItem("Master Sword Pedestal", nil)
   triforcePiecesItem := fyne.NewMenuItem("Triforce Pieces", nil)
+  additionalOptionsItem := fyne.NewMenuItem("Additional Options", )
   categoryItem.ChildMenu = fyne.NewMenu("",
     defaultCatItem,
     keysanityItem,
@@ -54,6 +50,7 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
     mapCompassBossShuffle,
     masterSwordItem,
     triforcePiecesItem,
+    additionalOptionsItem,
   )
 
   openPreferences := func() {
