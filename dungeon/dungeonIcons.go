@@ -102,26 +102,26 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *vip
   }
 
   var mapInt, compassInt, keyInt, bigKeyInt int
-    if preferencesConfig.GetBool("Maps") || mapBool == false {
-      mapInt = 0
-    } else {
-      mapInt = 1
-    }
-    if preferencesConfig.GetBool("Compasses") || compassBool == false  {
-      compassInt = 0
-    } else {
-      compassInt = 1
-    }
-    if preferencesConfig.GetBool("Keys") {
-      keyInt = 0
-    } else {
-      keyInt = 1
-    }
-    if preferencesConfig.GetBool("Big_Keys") || bigKeyBool == false  {
-      bigKeyInt = 0
-    } else {
-      bigKeyInt = 1
-    }
+  if preferencesConfig.GetBool("Maps") || mapBool == false {
+    mapInt = 0
+  } else {
+    mapInt = 1
+  }
+  if preferencesConfig.GetBool("Compasses") || compassBool == false  {
+    compassInt = 0
+  } else {
+    compassInt = 1
+  }
+  if preferencesConfig.GetBool("Keys") {
+    keyInt = 0
+  } else {
+    keyInt = 1
+  }
+  if preferencesConfig.GetBool("Big_Keys") || bigKeyBool == false  {
+    bigKeyInt = 0
+  } else {
+    bigKeyInt = 1
+  }
 
   chestCount := totalChecks - keys * (keyInt) - bigKeyInt - mapInt - compassInt
   dungeon.chestTapIcon, err = tappable_icons.NewTappableNumIconWithIcon([]fyne.Resource{resourceChestPng, resourceEmptyChestPng}, chestCount, false, 16*scaleConstant, undoStack, saveConfig, name + "_Chest")
@@ -292,6 +292,9 @@ func (d *dungeonIcons) preferencesUpdate() {
   if colCounter == 1 {
     d.nameTextContainer.Hide()
     d.prizeTapContainer.Hide()
+  } else {
+    d.nameTextContainer.Show()
+    d.prizeTapContainer.Show()
   }
 
   for _, element := range d.DungeonRow {

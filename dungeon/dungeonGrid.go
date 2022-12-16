@@ -168,6 +168,10 @@ func (d *DungeonGrid) Layout() *fyne.Container {
   return d.dungeonGrid
 }
 
+func (d *DungeonGrid) GetDungeonGrid() *fyne.Container {
+  return d.dungeonGrid
+}
+
 func (d *DungeonGrid) SaveUpdate() {
   d.easternPalace.saveUpdate()
   d.desertPalace.saveUpdate()

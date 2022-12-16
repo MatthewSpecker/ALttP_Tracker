@@ -344,6 +344,10 @@ func (i *InventoryIcons) Layout() *fyne.Container {
   return i.itemGrid
 }
 
+func (i *InventoryIcons) GetItemGrid() *fyne.Container {
+  return i.itemGrid
+}
+
 func (i *InventoryIcons) SaveUpdate() {
   i.bowTapIcon.Update()
   i.bowNonProgressiveTapIcon.Update()
