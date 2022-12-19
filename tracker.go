@@ -1,16 +1,12 @@
 package main
 
 import (
-  //"log"
   "fmt"
-  //"strings"
-  //"strconv"
-  //"image/color"
-  "os"
 
   "tracker/dungeon"
   "tracker/inventory"
   "tracker/menu"
+  "tracker/preferences"
   "tracker/save"
   "tracker/undo_redo"
 
@@ -18,7 +14,6 @@ import (
   "fyne.io/fyne/v2/app"
   "fyne.io/fyne/v2/container"
   "golang.design/x/hotkey"
-  "github.com/spf13/viper"
 )
 
 func inputCompare(input []string, shortcut[]string) bool {
@@ -79,37 +74,6 @@ func keyShortcutConstructor() [][]string {
   return keyShortcut
 }
 
-func viperConfig() *viper.Viper {
-  config := viper.New()
-  config.SetConfigName("tracker") // name of config file (without extension)
-  config.SetConfigType("toml") // REQUIRED if the config file does not have the extension in the name
-  //viper.AddConfigPath("/etc/appname/")   // path to look for the config file in
-  config.AddConfigPath(".")               // optionally look for config in the working directory
-  err := config.ReadInConfig() // Find and read the config file
-
-  if err != nil {
-    if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-      panic(fmt.Errorf("fatal error - no config file found: %w", err))
-    } else {
-      panic(fmt.Errorf("fatal error config file: %w", err))
-    }
-  }
-
-  config.BindEnv("fyne_scale")
-
-  fyneScale := config.GetFloat64("fyne_scale")
-
-  os.Setenv("FYNE_SCALE", fmt.Sprintf("%f", fyneScale))
-
-  //config.BindEnv("fyne_font")
-
-  //fyneFont := "PressStart2P-Regular.ttf"
-
-  //os.Setenv("FYNE_FONT", fmt.Sprintf("%s", fyneFont))
-
-  return config
-}
-
 func displayMainWindowContent(mainWindow fyne.Window, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
   mainGrid := container.NewHBox(inventory.Layout(), dungeon.Layout())
 
@@ -122,7 +86,7 @@ func main() {
   mainWindow.SetMaster()
   //mainWindow.SetFixedSize(true)
   saveConfig := save.NewSaveFile()
-  preferencesConfig := viperConfig()
+  preferencesConfig := preferences.NewPreferencesFile()
   undoStack := undo_redo.NewUndoRedoStacks()
   inventory, err := inventory.NewInventoryIcons(undoStack, preferencesConfig, saveConfig)
   if err != nil {
@@ -142,7 +106,7 @@ func main() {
 
   displayMainWindowContent(mainWindow, inventory, dungeon)
 
-  mainWindow.SetFullScreen(preferencesConfig.GetBool("Fullscreen"))
+  mainWindow.SetFullScreen(preferencesConfig.GetPreferenceBool("Fullscreen"))
 
   keyShortcut := keyShortcutConstructor()
   inputSave := make([]string, 0)
@@ -235,7 +199,7 @@ func main() {
   }()
 
   mainWindow.ShowAndRun()
-  preferencesConfig.Set("Fullscreen", mainWindow.FullScreen())
-  preferencesConfig.WriteConfig()
+  preferencesConfig.SetPreference("Fullscreen", mainWindow.FullScreen())
+  preferencesConfig.SavePreferences()
   saveConfig.SaveState()
 }

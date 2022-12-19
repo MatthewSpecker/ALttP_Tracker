@@ -73,6 +73,8 @@ fyne bundle -package inventory -append Moon_PearlGray.png >> bundled.go
 fyne bundle -package inventory -append Moon_Pearl.png >> bundled.go
 fyne bundle -package inventory -append MushroomGray.png >> bundled.go
 fyne bundle -package inventory -append Mushroom.png >> bundled.go
+fyne bundle -package inventory -append PedestalGray.png >> bundled.go
+fyne bundle -package inventory -append Pedestal.png >> bundled.go
 fyne bundle -package inventory -append Pegasus_BootsGray.png >> bundled.go
 fyne bundle -package inventory -append Pegasus_Boots.png >> bundled.go
 fyne bundle -package inventory -append Power_GlovesGray.png >> bundled.go
@@ -89,5 +91,7 @@ fyne bundle -package inventory -append SilversGray.png >> bundled.go
 fyne bundle -package inventory -append Silvers.png >> bundled.go
 fyne bundle -package inventory -append Tempered_Sword.png >> bundled.go
 fyne bundle -package inventory -append Titan_Mitts.png >> bundled.go
+fyne bundle -package inventory -append TriforceGray.png >> bundled.go
+fyne bundle -package inventory -append Triforce.png >> bundled.go
 fyne bundle -package inventory -append Witch.png >> bundled.go
 fyne bundle -package inventory -append Witch_Apprentice.png >> bundled.go

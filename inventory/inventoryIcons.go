@@ -2,6 +2,8 @@ package inventory
 
 import (
   "fmt"
+
+  "tracker/preferences"
   "tracker/save"
   "tracker/tappable_icons"
   "tracker/undo_redo"
@@ -10,8 +12,6 @@ import (
   "fyne.io/fyne/v2/container"
   "fyne.io/fyne/v2/layout"
   "fyne.io/fyne/v2/theme"
-
-  "github.com/spf13/viper"
 )
 
 type InventoryIcons struct {
@@ -35,10 +35,10 @@ type InventoryIcons struct {
   bugNetTapIcon *tappable_icons.TappableIcon
   bookOfMudoraTapIcon *tappable_icons.TappableIcon
   bottleTotalTapIcon *tappable_icons.TappableIconWithCenteredNum
-  bottle1TapIcon *tappable_icons.TappableIcon
-  bottle2TapIcon *tappable_icons.TappableIcon
-  bottle3TapIcon *tappable_icons.TappableIcon
-  bottle4TapIcon *tappable_icons.TappableIcon
+  bottle1TapIcon *tappable_icons.TappableIconCycled
+  bottle2TapIcon *tappable_icons.TappableIconCycled
+  bottle3TapIcon *tappable_icons.TappableIconCycled
+  bottle4TapIcon *tappable_icons.TappableIconCycled
   caneOfSomariaTapIcon *tappable_icons.TappableIcon
   caneOfByrnaTapIcon *tappable_icons.TappableIcon
   magicCapeTapIcon *tappable_icons.TappableIcon
@@ -52,10 +52,12 @@ type InventoryIcons struct {
   shieldTapIcon *tappable_icons.TappableIconVariedSize
   mailTapIcon *tappable_icons.TappableIcon
   halfMagicTapIcon *tappable_icons.TappableIcon
-  heartPieceTapIcon *tappable_icons.TappableHeartIcon
-  ganonBossGoalTapIcon *tappable_icons.TappableIcon
+  heartPieceTapIcon *tappable_icons.TappableIconCycled
+  ganonGoalTapIcon *tappable_icons.TappableIconWithBottomCenteredString
+  pedestalGoalTapIcon *tappable_icons.TappableIcon
+  triforceGoalTapIcon *tappable_icons.TappableIcon
   ganonTowerGoalTapIcon *tappable_icons.TappableIcon
-  preferencesFile *viper.Viper  
+  preferencesFile *preferences.PreferencesFile
   saveFile *save.SaveFile
   bowTapContainer *fyne.Container
   bowNonProgressiveTapContainer *fyne.Container
@@ -95,12 +97,14 @@ type InventoryIcons struct {
   mailTapContainer *fyne.Container
   halfMagicTapContainer *fyne.Container
   heartPieceTapContainer *fyne.Container
-  ganonBossGoalTapContainer *fyne.Container
+  ganonGoalTapContainer *fyne.Container
+  pedestalGoalTapContainer *fyne.Container
+  triforceGoalTapContainer *fyne.Container
   ganonTowerGoalTapContainer *fyne.Container
   itemGrid *fyne.Container
 }
 
-func NewInventoryIcons(undoRedo *undo_redo.UndoRedoStacks, preferencesConfig *viper.Viper, saveConfig *save.SaveFile) (*InventoryIcons, error) {
+func NewInventoryIcons(undoRedo *undo_redo.UndoRedoStacks, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile) (*InventoryIcons, error) {
   var err error
 	inventory := &InventoryIcons{
     preferencesFile: preferencesConfig,
@@ -186,19 +190,19 @@ func NewInventoryIcons(undoRedo *undo_redo.UndoRedoStacks, preferencesConfig *vi
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making bottleTapIcon: %w", err))
   }      
-  inventory.bottle1TapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 1")
+  inventory.bottle1TapIcon, err = tappable_icons.NewTappableIconCycled([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 1")
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making bottle1TapIcon: %w", err))
   }    
-  inventory.bottle2TapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 2")
+  inventory.bottle2TapIcon, err = tappable_icons.NewTappableIconCycled([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 2")
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making bottle2TapIcon: %w", err))
   }    
-  inventory.bottle3TapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 3")
+  inventory.bottle3TapIcon, err = tappable_icons.NewTappableIconCycled([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 3")
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making bottle3TapIcon: %w", err))
   }    
-  inventory.bottle4TapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 4")
+  inventory.bottle4TapIcon, err = tappable_icons.NewTappableIconCycled([]fyne.Resource{resourceEmptyBottleGrayPng, resourceEmptyBottlePng, resourceBottlewithBeePng, resourceBottlewithFairyPng, resourceBottlewithGreenPotionPng, resourceBottlewithRedPotionPng, resourceBottlewithBluePotionPng}, 16, undoRedo, saveConfig, "Bottle 4")
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making bottle4TapIcon: %w", err))
   }    
@@ -254,14 +258,22 @@ func NewInventoryIcons(undoRedo *undo_redo.UndoRedoStacks, preferencesConfig *vi
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making halfMagicTapIcon: %w", err))
   }    
-  inventory.heartPieceTapIcon, err = tappable_icons.NewTappableHeartIcon([]fyne.Resource{resourceHeartPieceGrayPng, resourceHeartPiece1Png, resourceHeartPiece2Png, resourceHeartPiece3Png}, 14, undoRedo, saveConfig, "Heart Pieces")
+  inventory.heartPieceTapIcon, err = tappable_icons.NewTappableIconCycled([]fyne.Resource{resourceHeartPieceGrayPng, resourceHeartPiece1Png, resourceHeartPiece2Png, resourceHeartPiece3Png}, 14, undoRedo, saveConfig, "Heart Pieces")
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making heartPieceTapIcon: %w", err))
   }    
-  inventory.ganonBossGoalTapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceGanonGrayPng, resourceGanonPng}, 20, undoRedo, saveConfig, "Ganon Boss")
+  inventory.ganonGoalTapIcon, err = tappable_icons.NewTappableIconWithBottomCenteredString([]fyne.Resource{resourceGanonGrayPng, resourceGanonPng}, 16, undoRedo, saveConfig, "Ganon Goal")
   if err != nil {
-    return nil, (fmt.Errorf("Encountered error making ganonBossGoalTapIcon: %w", err))
+    return nil, (fmt.Errorf("Encountered error making ganonGoalTapIcon: %w", err))
+  }
+  inventory.pedestalGoalTapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourcePedestalGrayPng, resourcePedestalPng}, 16, undoRedo, saveConfig, "Pedestal Goal")
+  if err != nil {
+    return nil, (fmt.Errorf("Encountered error making pedestalGoalTapIcon: %w", err))
   }    
+  inventory.triforceGoalTapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceTriforceGrayPng, resourceTriforcePng}, 16, undoRedo, saveConfig, "Triforce Goal")
+  if err != nil {
+    return nil, (fmt.Errorf("Encountered error making triforceGoalTapIcon: %w", err))
+  }     
   inventory.ganonTowerGoalTapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceGanonTowerGrayPng, resourceGanonTowerPng}, 20, undoRedo, saveConfig, "Ganon Tower Goal")
   if err != nil {
     return nil, (fmt.Errorf("Encountered error making ganonTowerGoalTapIcon: %w", err))
@@ -316,8 +328,11 @@ func (i *InventoryIcons) Layout() *fyne.Container {
   i.shieldTapContainer = container.New(layout.NewCenterLayout(), i.shieldTapIcon) 
   i.mailTapContainer = container.New(layout.NewCenterLayout(), i.mailTapIcon)  
   i.halfMagicTapContainer = container.New(layout.NewCenterLayout(), i.halfMagicTapIcon)   
-  i.heartPieceTapContainer = container.New(layout.NewCenterLayout(), i.heartPieceTapIcon) 
-  i.ganonBossGoalTapContainer = container.New(layout.NewCenterLayout(), i.ganonBossGoalTapIcon)   
+  i.heartPieceTapContainer = container.New(layout.NewCenterLayout(), i.heartPieceTapIcon)
+  ganonGoalTapContainedIcon := i.ganonGoalTapIcon.LayoutAdjust()   
+  i.ganonGoalTapContainer = container.New(layout.NewCenterLayout(), ganonGoalTapContainedIcon)
+  i.pedestalGoalTapContainer = container.New(layout.NewCenterLayout(), i.pedestalGoalTapIcon)
+  i.triforceGoalTapContainer = container.New(layout.NewCenterLayout(), i.triforceGoalTapIcon)
   i.ganonTowerGoalTapContainer = container.New(layout.NewCenterLayout(), i.ganonTowerGoalTapIcon)
 
   boomContainer1 := container.NewWithoutLayout(i.blueBoomerangTapContainer, i.redBoomerangTapContainer)
@@ -328,14 +343,14 @@ func (i *InventoryIcons) Layout() *fyne.Container {
   i.blueBoomerangTapContainer.Move(blueBoomChangePosition)
   i.redBoomerangTapContainer.Move(redBoomChangePosition)
 
-  i.itemGrid = container.New(layout.NewGridLayout(4), i.bowTapContainer, i.bowNonProgressiveTapContainer, boomContainer2, 
-    i.hookshotTapContainer, i.bombTapContainer, i.mushroomTapContainer, i.magicPowderTapContainer, i.fireRodTapContainer,
-    i.iceRodTapContainer, i.bombosTapContainer, i.etherTapContainer, i.quakeTapContainer, i.lampTapContainer,
-    i.hammerTapContainer, i.fluteTapContainer, i.shovelTapContainer, i.bugNetTapContainer, i.bookOfMudoraTapContainer,
-    i.bottleTotalTapContainer, i.bottle1TapContainer, i.bottle2TapContainer, i.bottle3TapContainer, i.bottle4TapContainer,
+  i.itemGrid = container.New(layout.NewGridLayout(4), i.bowTapContainer, i.bowNonProgressiveTapContainer, boomContainer2, i.hookshotTapContainer, 
+    i.bombTapContainer, i.mushroomTapContainer, i.magicPowderTapContainer, i.fireRodTapContainer, i.iceRodTapContainer, i.bombosTapContainer, 
+    i.etherTapContainer, i.quakeTapContainer, i.lampTapContainer, i.hammerTapContainer, i.fluteTapContainer, i.shovelTapContainer, i.bugNetTapContainer, 
+    i.bookOfMudoraTapContainer, i.bottleTotalTapContainer, i.bottle1TapContainer, i.bottle2TapContainer, i.bottle3TapContainer, i.bottle4TapContainer,
     i.caneOfSomariaTapContainer, i.caneOfByrnaTapContainer, i.magicCapeTapContainer, i.magicMirrorTapContainer, i.pseudoPegasusBootsTapContainer, 
-    i.pegasusBootsTapContainer, i.glovesTapContainer, i.flippersTapContainer, i.moonPearlTapContainer, i.swordTapContainer,
-    i.shieldTapContainer, i.mailTapContainer, i.halfMagicTapContainer, i.heartPieceTapContainer, i.ganonBossGoalTapContainer, i.ganonTowerGoalTapContainer)
+    i.pegasusBootsTapContainer, i.glovesTapContainer, i.flippersTapContainer, i.moonPearlTapContainer, i.swordTapContainer, i.shieldTapContainer,
+    i.mailTapContainer, i.halfMagicTapContainer, i.heartPieceTapContainer, i.ganonGoalTapContainer, i.pedestalGoalTapContainer, i.triforceGoalTapContainer, 
+    i.ganonTowerGoalTapContainer)
 
   i.CreateSaveDefaults()
   i.SaveUpdate()
@@ -387,17 +402,24 @@ func (i *InventoryIcons) SaveUpdate() {
   i.mailTapIcon.Update()
   i.halfMagicTapIcon.Update()
   i.heartPieceTapIcon.Update()
-  i.ganonBossGoalTapIcon.Update()
+  i.ganonGoalTapIcon.Update()
+  i.pedestalGoalTapIcon.Update()
+  i.triforceGoalTapIcon.Update()
   i.ganonTowerGoalTapIcon.Update()
 }
 
+func (i *InventoryIcons) UpdateGanonGoal(value int) {
+  i.saveFile.SetSave("Ganon Goal_Current", value)
+  i.ganonGoalTapIcon.Update()
+}
+
 func (i *InventoryIcons) PreferencesUpdate() {
-  if i.preferencesFile.GetBool("Bombs") {
+  if i.preferencesFile.GetPreferenceBool("Bombs") {
     i.bombTapContainer.Show()
   } else {
     i.bombTapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("Bottle_Full") {
+  if i.preferencesFile.GetPreferenceBool("Bottle_Full") {
     i.bottle1TapContainer.Show()
     i.bottle2TapContainer.Show()
     i.bottle3TapContainer.Show()
@@ -410,44 +432,62 @@ func (i *InventoryIcons) PreferencesUpdate() {
     i.bottle3TapContainer.Hide()
     i.bottle4TapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("HalfMagic") {
+  if i.preferencesFile.GetPreferenceBool("HalfMagic") {
     i.halfMagicTapContainer.Show()
   } else {
     i.halfMagicTapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("Heart_Pieces") {
+  if i.preferencesFile.GetPreferenceBool("Heart_Pieces") {
     i.heartPieceTapContainer.Show()
   } else {
     i.heartPieceTapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("Mail") {
+  if i.preferencesFile.GetPreferenceBool("Mail") {
     i.mailTapContainer.Show()
   } else {
     i.mailTapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("Shield") {
+  if i.preferencesFile.GetPreferenceBool("Shield") {
     i.shieldTapContainer.Show()
   } else {
     i.shieldTapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("Sword") {
+  if i.preferencesFile.GetPreferenceBool("Sword") {
     i.swordTapContainer.Show()
   } else {
     i.swordTapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("Pseudo_Boots") {
+  if i.preferencesFile.GetPreferenceBool("Pseudo_Boots") {
     i.pseudoPegasusBootsTapContainer.Show()
     i.pegasusBootsTapContainer.Hide()
   } else {
     i.pegasusBootsTapContainer.Show()
     i.pseudoPegasusBootsTapContainer.Hide()
   }
-  if i.preferencesFile.GetBool("Progressive_Bows") {
+  if i.preferencesFile.GetPreferenceBool("Progressive_Bows") {
     i.bowTapContainer.Show()
     i.bowNonProgressiveTapContainer.Hide()
   } else {
     i.bowNonProgressiveTapContainer.Show()
     i.bowTapContainer.Hide()
+  }
+  if i.preferencesFile.GetPreferenceInt("Goal") == 0 {
+    i.ganonGoalTapContainer.Show()
+    i.pedestalGoalTapContainer.Hide()
+    i.triforceGoalTapContainer.Hide()
+  } else if i.preferencesFile.GetPreferenceInt("Goal") == 1 {
+    i.ganonGoalTapContainer.Hide()
+    i.pedestalGoalTapContainer.Show()
+    i.triforceGoalTapContainer.Hide()
+  } else if i.preferencesFile.GetPreferenceInt("Goal") == 2 {
+    i.ganonGoalTapContainer.Hide()
+    i.pedestalGoalTapContainer.Hide()
+    i.triforceGoalTapContainer.Show()
+  } else {
+    i.preferencesFile.SetPreference("Goal", 0)
+    i.ganonGoalTapContainer.Show()
+    i.pedestalGoalTapContainer.Hide()
+    i.triforceGoalTapContainer.Hide()
   }
 
   i.itemGrid.Refresh()
@@ -492,7 +532,9 @@ func (i *InventoryIcons) CreateSaveDefaults() {
   i.mailTapIcon.SetSaveDefaults()
   i.halfMagicTapIcon.SetSaveDefaults()
   i.heartPieceTapIcon.SetSaveDefaults()
-  i.ganonBossGoalTapIcon.SetSaveDefaults()
+  i.ganonGoalTapIcon.SetSaveDefaults()
+  i.pedestalGoalTapIcon.SetSaveDefaults()
+  i.triforceGoalTapIcon.SetSaveDefaults()
   i.ganonTowerGoalTapIcon.SetSaveDefaults()
 }
 
@@ -535,6 +577,8 @@ func (i *InventoryIcons) RestoreDefaults() {
   i.mailTapIcon.GetSaveDefaults()
   i.halfMagicTapIcon.GetSaveDefaults()
   i.heartPieceTapIcon.GetSaveDefaults()
-  i.ganonBossGoalTapIcon.GetSaveDefaults()
+  i.ganonGoalTapIcon.GetSaveDefaults()
+  i.pedestalGoalTapIcon.GetSaveDefaults()
+  i.triforceGoalTapIcon.GetSaveDefaults()
   i.ganonTowerGoalTapIcon.GetSaveDefaults()
 }

@@ -5,7 +5,7 @@ import (
   "fmt"
   "image/color"
 
-
+  "tracker/preferences"
   "tracker/save"
   "tracker/tappable_icons"
   "tracker/undo_redo"
@@ -14,8 +14,6 @@ import (
   "fyne.io/fyne/v2/canvas"
   "fyne.io/fyne/v2/container"
   "fyne.io/fyne/v2/layout"
-
-  "github.com/spf13/viper"
 )
 
 type dungeonIcons struct {
@@ -28,7 +26,7 @@ type dungeonIcons struct {
   keyTapIcon *tappable_icons.TappableNumIconWithIcon
   bigKeyTapIcon *tappable_icons.TappableIcon
   bossTapIcon *tappable_icons.TappableBossIcon
-  preferencesFile *viper.Viper  
+  preferencesFile *preferences.PreferencesFile
   saveFile *save.SaveFile
   prizeBool bool
   bossBool bool
@@ -49,7 +47,7 @@ type dungeonIcons struct {
   DungeonRow []*fyne.Container
 }
 
-func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *viper.Viper, saveConfig *save.SaveFile, scaleConstant float32, name string, prizeBool bool, bossBool bool, bossInt int, mapBool bool, compassBool bool, bigKeyBool bool, keys int, totalChecks int) (*dungeonIcons, error) {
+func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile, scaleConstant float32, name string, prizeBool bool, bossBool bool, bossInt int, mapBool bool, compassBool bool, bigKeyBool bool, keys int, totalChecks int) (*dungeonIcons, error) {
   if scaleConstant <= 0 {
     return nil, errors.New("'scaleConstant' must be greater than 0")
   }
@@ -102,22 +100,22 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *vip
   }
 
   var mapInt, compassInt, keyInt, bigKeyInt int
-  if preferencesConfig.GetBool("Maps") || mapBool == false {
+  if preferencesConfig.GetPreferenceBool("Maps") || mapBool == false {
     mapInt = 0
   } else {
     mapInt = 1
   }
-  if preferencesConfig.GetBool("Compasses") || compassBool == false  {
+  if preferencesConfig.GetPreferenceBool("Compasses") || compassBool == false  {
     compassInt = 0
   } else {
     compassInt = 1
   }
-  if preferencesConfig.GetBool("Keys") {
+  if preferencesConfig.GetPreferenceBool("Keys") {
     keyInt = 0
   } else {
     keyInt = 1
   }
-  if preferencesConfig.GetBool("Big_Keys") || bigKeyBool == false  {
+  if preferencesConfig.GetPreferenceBool("Big_Keys") || bigKeyBool == false  {
     bigKeyInt = 0
   } else {
     bigKeyInt = 1
@@ -252,38 +250,44 @@ func (d *dungeonIcons) preferencesUpdate() {
   if d.prizeBool == false {
     colCounter--
   }
-  if d.preferencesFile.GetBool("Chest_Count") {
+  if d.preferencesFile.GetPreferenceBool("Chest_Count") {
     d.chestTapContainer.Show()
   } else {
     d.chestTapContainer.Hide()
     colCounter--
   }
-  if d.preferencesFile.GetBool("Maps") {
+  if d.preferencesFile.GetPreferenceBool("Maps") {
     d.mapTapContainer.Show()
   } else {
     d.mapTapContainer.Hide()
     colCounter--
   }
-  if d.preferencesFile.GetBool("Compasses") {
+  if d.preferencesFile.GetPreferenceBool("Compasses") {
     d.compassTapContainer.Show()
   } else {
     d.compassTapContainer.Hide()
     colCounter--
   }
-  if d.preferencesFile.GetBool("Keys") {
+  if d.preferencesFile.GetPreferenceBool("Keys") || d.preferencesFile.GetPreferenceBool("Keys_Required") {
     d.keyTapContainer.Show()
   } else {
     d.keyTapContainer.Hide()
     colCounter--
   }
-  if d.preferencesFile.GetBool("Big_Keys") {
+  if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.preferencesFile.GetPreferenceBool("Big_Keys_Required") {
     d.bigKeyTapContainer.Show()
+    if d.bigKeyBool == false {
+      colCounter--
+    }
   } else {
     d.bigKeyTapContainer.Hide()
     colCounter--
   }
-  if d.preferencesFile.GetBool("Bosses") {
+  if d.preferencesFile.GetPreferenceBool("Bosses") || d.preferencesFile.GetPreferenceBool("Bosses_Required") {
     d.bossTapContainer.Show()
+    if d.bossBool == false {
+      colCounter--
+    }
   } else {
     d.bossTapContainer.Hide()
     colCounter--
@@ -292,6 +296,12 @@ func (d *dungeonIcons) preferencesUpdate() {
   if colCounter == 1 {
     d.nameTextContainer.Hide()
     d.prizeTapContainer.Hide()
+    d.chestTapContainer.Hide()
+    d.mapTapContainer.Hide()
+    d.compassTapContainer.Hide()
+    d.keyTapContainer.Hide()
+    d.bigKeyTapContainer.Hide()
+    d.bossTapContainer.Hide()
   } else {
     d.nameTextContainer.Show()
     d.prizeTapContainer.Show()

@@ -4,14 +4,13 @@ import (
   "errors"
   "fmt"
 
+  "tracker/preferences"
   "tracker/save"
   "tracker/undo_redo"
 
   "fyne.io/fyne/v2"
   "fyne.io/fyne/v2/container"
   "fyne.io/fyne/v2/layout"
-
-  "github.com/spf13/viper"
 )
 
 type DungeonGrid struct {
@@ -28,12 +27,12 @@ type DungeonGrid struct {
   miseryMire *dungeonIcons
   turtleRock *dungeonIcons
   ganonsTower *dungeonIcons
-  preferencesFile *viper.Viper  
+  preferencesFile *preferences.PreferencesFile  
   saveFile *save.SaveFile
   dungeonGrid *fyne.Container
 }
 
-func NewDungeonGrid(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *viper.Viper, saveConfig *save.SaveFile, scaleConstant float32) (*DungeonGrid, error) {
+func NewDungeonGrid(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile, scaleConstant float32) (*DungeonGrid, error) {
   if scaleConstant <= 0 {
     return nil, errors.New("'scaleConstant' must be greater than 0")
   }
@@ -102,22 +101,22 @@ func NewDungeonGrid(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *vipe
 func (d *DungeonGrid) Layout() *fyne.Container {
   gridCol := 2
 
-  if d.preferencesFile.GetBool("Chest_Count") {
+  if d.preferencesFile.GetPreferenceBool("Chest_Count") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Maps") {
+  if d.preferencesFile.GetPreferenceBool("Maps") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Compasses") {
+  if d.preferencesFile.GetPreferenceBool("Compasses") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Keys") {
+  if d.preferencesFile.GetPreferenceBool("Keys") || d.preferencesFile.GetPreferenceBool("Keys_Required") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Big_Keys") {
+  if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.preferencesFile.GetPreferenceBool("Big_Keys_Required") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Bosses") {
+  if d.preferencesFile.GetPreferenceBool("Bosses") || d.preferencesFile.GetPreferenceBool("Bosses_Required") {
     gridCol++
   }
 
@@ -205,22 +204,22 @@ func (d *DungeonGrid) PreferencesUpdate() {
 
   gridCol := 2
 
-  if d.preferencesFile.GetBool("Chest_Count") {
+  if d.preferencesFile.GetPreferenceBool("Chest_Count") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Maps") {
+  if d.preferencesFile.GetPreferenceBool("Maps") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Compasses") {
+  if d.preferencesFile.GetPreferenceBool("Compasses") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Keys") {
+  if d.preferencesFile.GetPreferenceBool("Keys") || d.preferencesFile.GetPreferenceBool("Keys_Required") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Big_Keys") {
+  if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.preferencesFile.GetPreferenceBool("Big_Keys_Required") {
     gridCol++
   }
-  if d.preferencesFile.GetBool("Bosses") {
+  if d.preferencesFile.GetPreferenceBool("Bosses") || d.preferencesFile.GetPreferenceBool("Bosses_Required") {
     gridCol++
   }
 

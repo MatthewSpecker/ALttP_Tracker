@@ -111,8 +111,9 @@ func (t *TappableIconWithCenteredNum) LayoutAdjust() *fyne.Container {
   container2 := container.New(layout.NewCenterLayout(), t.outlineText.TextOutlineContainer)
   container3 := container.NewWithoutLayout(container1, container2)
   iconSize := t.Size()
+  container2Size := t.outlineText.TextOutlineContainer.Size()
   iconChangePosition := container2.Position()
-  iconChangePosition = iconChangePosition.AddXY(iconSize.Width/2, iconSize.Height*0.6)
+  iconChangePosition = iconChangePosition.AddXY(iconSize.Width/2 - container2Size.Width/2, iconSize.Height*0.6 - container2Size.Height/2)
   container2.Move(iconChangePosition)
 
   return container3

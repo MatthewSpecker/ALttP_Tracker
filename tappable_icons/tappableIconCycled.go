@@ -15,7 +15,7 @@ import (
   "fyne.io/fyne/v2/driver/desktop"
 )
 
-type TappableHeartIcon struct {
+type TappableIconCycled struct {
   widget.Icon
   desktop.Hoverable
   resources []fyne.Resource
@@ -28,7 +28,7 @@ type TappableHeartIcon struct {
   saveFileText string
 }
 
-func NewTappableHeartIcon(res []fyne.Resource, size float32, undoRedo *undo_redo.UndoRedoStacks, save *save.SaveFile, saveName string) (*TappableHeartIcon, error) {
+func NewTappableIconCycled(res []fyne.Resource, size float32, undoRedo *undo_redo.UndoRedoStacks, save *save.SaveFile, saveName string) (*TappableIconCycled, error) {
   if len(res) <= 1 {
     return nil, errors.New("'res' must contain 2 or more resources")
   }
@@ -39,7 +39,7 @@ func NewTappableHeartIcon(res []fyne.Resource, size float32, undoRedo *undo_redo
     return nil, errors.New("'saveName' cannot be empty string")
   }
 
-  icon := &TappableHeartIcon{
+  icon := &TappableIconCycled{
     resources: res,
     current: 0,
     tapSize: size,
@@ -55,7 +55,7 @@ func NewTappableHeartIcon(res []fyne.Resource, size float32, undoRedo *undo_redo
   return icon, nil
 }
 
-func (t *TappableHeartIcon) Update() {
+func (t *TappableIconCycled) Update() {
   t.current = t.saveFile.GetSaveInt(t.saveFileText + "_Current")
   t.current = intRangeCheck(t.current, len(t.resources) - 1, 0)
   t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
@@ -63,21 +63,21 @@ func (t *TappableHeartIcon) Update() {
   t.Icon.SetResource(t.resources[t.current])
 }
 
-func (t *TappableHeartIcon) SetSaveDefaults() {
+func (t *TappableIconCycled) SetSaveDefaults() {
   t.saveFile.SetDefault(t.saveFileText + "_Current", 0)
 }
 
-func (t *TappableHeartIcon) GetSaveDefaults() {
+func (t *TappableIconCycled) GetSaveDefaults() {
   t.current = 0
   t.saveFile.SetSave(t.saveFileText + "_Current", t.current)
   t.Update()
 }
 
-func (t *TappableHeartIcon) MinSize() fyne.Size {
+func (t *TappableIconCycled) MinSize() fyne.Size {
   return fyne.NewSize(theme.Padding()*t.tapSize/2, theme.Padding()*t.tapSize/2)
 }
 
-func (t *TappableHeartIcon) increment() {
+func (t *TappableIconCycled) increment() {
   if t.current < (len(t.resources) - 1) {
     t.current++
   } else {
@@ -87,7 +87,7 @@ func (t *TappableHeartIcon) increment() {
   t.saveFile.SetSave(t.saveFileText + "_Current", t.current)
 }
 
-func (t *TappableHeartIcon) decrement() {
+func (t *TappableIconCycled) decrement() {
   if t.current > 0 {
     t.current--
   } else {
@@ -97,33 +97,33 @@ func (t *TappableHeartIcon) decrement() {
   t.saveFile.SetSave(t.saveFileText + "_Current", t.current)
 }
 
-func (t *TappableHeartIcon) Tapped(_ *fyne.PointEvent) {
+func (t *TappableIconCycled) Tapped(_ *fyne.PointEvent) {
   t.undoRedoStacks.StoreFunctions(t.decrement, t.increment)
   t.increment()
 }
 
-func (t *TappableHeartIcon) TappedSecondary(_ *fyne.PointEvent) {
+func (t *TappableIconCycled) TappedSecondary(_ *fyne.PointEvent) {
   t.undoRedoStacks.StoreFunctions(t.increment, t.decrement)
   t.decrement()
 }
 
-func (t *TappableHeartIcon) Keyed() {
+func (t *TappableIconCycled) Keyed() {
   t.undoRedoStacks.StoreFunctions(t.decrement, t.increment)
   t.increment()
 }
 
-func (t *TappableHeartIcon) MouseIn(event *desktop.MouseEvent) {
-  //t.toolTipPopUp = newToolTipTextTappableHeartIcon(event, t.toolTipText, t)
+func (t *TappableIconCycled) MouseIn(event *desktop.MouseEvent) {
+  //t.toolTipPopUp = newToolTipTextTappableIconCycled(event, t.toolTipText, t)
 }
 
-func (t *TappableHeartIcon) MouseMoved(_ *desktop.MouseEvent) {
+func (t *TappableIconCycled) MouseMoved(_ *desktop.MouseEvent) {
 }
 
-func (t *TappableHeartIcon) MouseOut() {
+func (t *TappableIconCycled) MouseOut() {
   //t.toolTipPopUp.Hide()
 }
 
-func newToolTipTextTappableHeartIcon (event *desktop.MouseEvent, text string, object *TappableHeartIcon) *widget.PopUp {
+func newToolTipTextTappableIconCycled (event *desktop.MouseEvent, text string, object *TappableIconCycled) *widget.PopUp {
   toolTipText := canvas.NewText(text, color.White)
   popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
   var popUpPosition fyne.Position

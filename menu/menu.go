@@ -9,6 +9,7 @@ import (
 
   "tracker/dungeon"
   "tracker/inventory"
+  "tracker/preferences"
   "tracker/save"
   "tracker/undo_redo"
 
@@ -18,7 +19,6 @@ import (
   "fyne.io/fyne/v2/widget"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
-	"github.com/spf13/viper"
 )
 
 func almostEqual (a, b float64) bool {
@@ -30,23 +30,144 @@ func almostEqual (a, b float64) bool {
   }
 }
 
-func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoRedoStacks, preferencesConfig *viper.Viper, saveConfig *save.SaveFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) *fyne.MainMenu {
+func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoRedoStacks, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) *fyne.MainMenu {
+  openCategory := func() {
+    categoryWindow := myApp.NewWindow("Category Options")
+    categoryWindow.Resize(mainWindow.Content().Size())
+
+    progressive_BowsBool := preferencesConfig.GetPreferenceBool("Progressive_Bows")
+    progressive_BowsCheck := widget.NewCheck("Progressive Bows", func(value bool) {
+      progressive_BowsBool = value
+    })
+    progressive_BowsCheck.Checked = preferencesConfig.GetPreferenceBool("Progressive_Bows")
+    progressive_BowsContainer := container.NewVBox(progressive_BowsCheck)
+
+    pseudo_BootsBool := preferencesConfig.GetPreferenceBool("Pseudo_Boots")
+    pseudo_BootsCheck := widget.NewCheck("Pseudo Boots", func(value bool) {
+      pseudo_BootsBool = value
+    })
+    pseudo_BootsCheck.Checked = preferencesConfig.GetPreferenceBool("Pseudo_Boots")
+    pseudo_BootsContainer := container.NewVBox(pseudo_BootsCheck)
+
+    keysBool := preferencesConfig.GetPreferenceBool("Keys_Required")
+    keysCheck := widget.NewCheck("Shuffled Small Keys", func(value bool) {
+      keysBool = value
+    })
+    keysCheck.Checked = preferencesConfig.GetPreferenceBool("Keys_Required")
+    keysContainer := container.NewVBox(keysCheck)
+
+    big_KeysBool := preferencesConfig.GetPreferenceBool("Big_Keys_Required")
+    big_KeysCheck := widget.NewCheck("Shuffled Big Keys", func(value bool) {
+      big_KeysBool = value
+    })
+    big_KeysCheck.Checked = preferencesConfig.GetPreferenceBool("Big_Keys_Required")
+    big_KeysContainer := container.NewVBox(big_KeysCheck)
+
+    bossBool := preferencesConfig.GetPreferenceBool("Bosses_Required")
+    bossCheck := widget.NewCheck("Shuffled Bosses", func(value bool) {
+      bossBool = value
+    })
+    bossCheck.Checked = preferencesConfig.GetPreferenceBool("Bosses_Required")
+    bossContainer := container.NewVBox(bossCheck)
+    mainWindow.Hide()
+
+    applyButton := widget.NewButton("Apply Changes", func() {
+      preferencesConfig.SetPreference("Progressive_Bows", progressive_BowsBool)
+      preferencesConfig.SetPreference("Pseudo_Boots", pseudo_BootsBool)
+      preferencesConfig.SetPreference("Key_Requireds", keysBool)
+      preferencesConfig.SetPreference("Big_Keys_Required", big_KeysBool)
+      preferencesConfig.SetPreference("Bosses_Required", bossBool)
+      preferencesConfig.SavePreferences()
+      inventory.PreferencesUpdate()
+      dungeon.PreferencesUpdate()
+      categoryWindow.Close()
+    })
+    cancelButton := widget.NewButton("Cancel", func() {
+      categoryWindow.Close()
+    })
+
+    buttonContainer := container.NewHBox(applyButton, cancelButton)
+    categoryContainer := container.New(layout.NewGridLayout(1), progressive_BowsContainer,
+      pseudo_BootsContainer, keysContainer, big_KeysContainer, bossContainer)
+    mainContainer := container.NewVBox(categoryContainer, buttonContainer)
+    scrollContainer := container.NewVScroll(mainContainer)
+
+    categoryWindow.SetContent(scrollContainer)
+    categoryWindow.Show()
+    categoryWindow.SetOnClosed(mainWindow.Show)
+  }
+
   categoryItem := fyne.NewMenuItem("Category", nil)
   defaultCatItem := fyne.NewMenuItem("Default", func() {
-    
+    //change ganon tower goal number to 7
+    inventory.UpdateGanonGoal(7)
+    preferencesConfig.SetPreference("Goal", 0)
+    preferencesConfig.SetPreference("Keys_Required", false)
+    preferencesConfig.SetPreference("Big_Keys_Required", false)
+    preferencesConfig.SetPreference("Bosses_Required", false)
+    preferencesConfig.SavePreferences()
+    inventory.PreferencesUpdate()
+    dungeon.PreferencesUpdate()
   })
-  keysanityItem := fyne.NewMenuItem("Keysanity", nil)
-  allDungeonsItem := fyne.NewMenuItem("All Dungeons", nil)
-  fastGanonItem := fyne.NewMenuItem("Fast Ganon", nil)
-  mapCompassBossShuffle := fyne.NewMenuItem("Map/Compass Boss Shuffle", nil)
-  masterSwordItem := fyne.NewMenuItem("Master Sword Pedestal", nil)
-  triforcePiecesItem := fyne.NewMenuItem("Triforce Pieces", nil)
-  additionalOptionsItem := fyne.NewMenuItem("Additional Options", )
+  keysanityItem := fyne.NewMenuItem("Keysanity", func() {
+    //change ganon tower goal number to 7
+    inventory.UpdateGanonGoal(7)
+    preferencesConfig.SetPreference("Goal", 0)
+    preferencesConfig.SetPreference("Keys_Required", true)
+    preferencesConfig.SetPreference("Big_Keys_Required", true)
+    preferencesConfig.SetPreference("Bosses_Required", false)
+    preferencesConfig.SavePreferences()
+    inventory.PreferencesUpdate()
+    dungeon.PreferencesUpdate()
+  })
+  allDungeonsItem := fyne.NewMenuItem("All Dungeons", func() {
+    //change ganon tower goal number to 7
+    inventory.UpdateGanonGoal(8)
+    preferencesConfig.SetPreference("Goal", 0)
+    preferencesConfig.SetPreference("Keys_Required", false)
+    preferencesConfig.SetPreference("Big_Keys_Required", false)
+    preferencesConfig.SetPreference("Bosses_Required", false)
+    preferencesConfig.SavePreferences()
+    inventory.PreferencesUpdate()
+    dungeon.PreferencesUpdate()
+  })
+  mapCompassBossShuffle := fyne.NewMenuItem("Map/Compass Boss Shuffle", func() {
+    //change ganon tower goal number to 7
+    inventory.UpdateGanonGoal(7)
+    preferencesConfig.SetPreference("Goal", 0)
+    preferencesConfig.SetPreference("Keys_Required", false)
+    preferencesConfig.SetPreference("Big_Keys_Required", false)
+    preferencesConfig.SetPreference("Bosses_Required", true)
+    preferencesConfig.SavePreferences()
+    inventory.PreferencesUpdate()
+    dungeon.PreferencesUpdate()
+  })
+  masterSwordItem := fyne.NewMenuItem("Master Sword Pedestal", func() {
+    //change ganon tower goal number to 7
+    preferencesConfig.SetPreference("Goal", 1)
+    preferencesConfig.SetPreference("Keys_Required", false)
+    preferencesConfig.SetPreference("Big_Keys_Required", false)
+    preferencesConfig.SetPreference("Bosses_Required", false)
+    preferencesConfig.SavePreferences()
+    inventory.PreferencesUpdate()
+    dungeon.PreferencesUpdate()
+  })
+  triforcePiecesItem := fyne.NewMenuItem("Triforce Pieces", func() {
+    //change ganon tower goal number to 7
+    preferencesConfig.SetPreference("Goal", 2)
+    preferencesConfig.SetPreference("Keys_Required", false)
+    preferencesConfig.SetPreference("Big_Keys_Required", false)
+    preferencesConfig.SetPreference("Bosses_Required", false)
+    preferencesConfig.SavePreferences()
+    inventory.PreferencesUpdate()
+    dungeon.PreferencesUpdate()
+  })
+  additionalOptionsItem := fyne.NewMenuItem("Additional Options", openCategory)
+  additionalOptionsItem.Icon = theme.SettingsIcon()
   categoryItem.ChildMenu = fyne.NewMenu("",
     defaultCatItem,
     keysanityItem,
     allDungeonsItem,
-    fastGanonItem,
     mapCompassBossShuffle,
     masterSwordItem,
     triforcePiecesItem,
@@ -57,129 +178,113 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
     prefWindow := myApp.NewWindow("App Preferences")
     prefWindow.Resize(mainWindow.Content().Size())
 
-    progressive_BowsBool := preferencesConfig.GetBool("Progressive_Bows")
-    progressive_BowsCheck := widget.NewCheck("Progressive Bows", func(value bool) {
-      progressive_BowsBool = value
-    })
-    progressive_BowsCheck.Checked = preferencesConfig.GetBool("Progressive_Bows")
-    progressive_BowsContainer := container.NewVBox(progressive_BowsCheck)
-
-    bombBool := preferencesConfig.GetBool("Bombs")
+    bombBool := preferencesConfig.GetPreferenceBool("Bombs")
     bombCheck := widget.NewCheck("Bombs", func(value bool) {
       bombBool = value
     })
-    bombCheck.Checked = preferencesConfig.GetBool("Bombs")
+    bombCheck.Checked = preferencesConfig.GetPreferenceBool("Bombs")
     bombContainer := container.NewVBox(bombCheck)
 
-    bottle_FullBool := preferencesConfig.GetBool("Bottle_Full")
+    bottle_FullBool := preferencesConfig.GetPreferenceBool("Bottle_Full")
     bottle_FullCheck := widget.NewCheck("Track Potions", func(value bool) {
       bottle_FullBool = value
     })
-    bottle_FullCheck.Checked = preferencesConfig.GetBool("Bottle_Full")
+    bottle_FullCheck.Checked = preferencesConfig.GetPreferenceBool("Bottle_Full")
     bottle_FullContainer := container.NewVBox(bottle_FullCheck)
 
-    pseudo_BootsBool := preferencesConfig.GetBool("Pseudo_Boots")
-    pseudo_BootsCheck := widget.NewCheck("Pseudo Boots", func(value bool) {
-      pseudo_BootsBool = value
-    })
-    pseudo_BootsCheck.Checked = preferencesConfig.GetBool("Pseudo_Boots")
-    pseudo_BootsContainer := container.NewVBox(pseudo_BootsCheck)
-
-    swordBool := preferencesConfig.GetBool("Sword")
+    swordBool := preferencesConfig.GetPreferenceBool("Sword")
     swordCheck := widget.NewCheck("Sword", func(value bool) {
       swordBool = value
     })
-    swordCheck.Checked = preferencesConfig.GetBool("Sword")
+    swordCheck.Checked = preferencesConfig.GetPreferenceBool("Sword")
     swordContainer := container.NewVBox(swordCheck)
 
-    shieldBool := preferencesConfig.GetBool("Shield")
+    shieldBool := preferencesConfig.GetPreferenceBool("Shield")
     shieldCheck := widget.NewCheck("Shield", func(value bool) {
       shieldBool = value
     })
-    shieldCheck.Checked = preferencesConfig.GetBool("Shield")
+    shieldCheck.Checked = preferencesConfig.GetPreferenceBool("Shield")
     shieldContainer := container.NewVBox(shieldCheck)
 
-    mailBool := preferencesConfig.GetBool("Mail")
+    mailBool := preferencesConfig.GetPreferenceBool("Mail")
     mailCheck := widget.NewCheck("Mail", func(value bool) {
       mailBool = value
     })
-    mailCheck.Checked = preferencesConfig.GetBool("Mail")
+    mailCheck.Checked = preferencesConfig.GetPreferenceBool("Mail")
     mailContainer := container.NewVBox(mailCheck)
 
-    halfMagicBool := preferencesConfig.GetBool("HalfMagic")
+    halfMagicBool := preferencesConfig.GetPreferenceBool("HalfMagic")
     halfMagicCheck := widget.NewCheck("Half-Magic", func(value bool) {
       halfMagicBool = value
     })
-    halfMagicCheck.Checked = preferencesConfig.GetBool("HalfMagic")
+    halfMagicCheck.Checked = preferencesConfig.GetPreferenceBool("HalfMagic")
     halfMagicContainer := container.NewVBox(halfMagicCheck)
 
-    heart_PiecesBool := preferencesConfig.GetBool("Heart_Pieces")
+    heart_PiecesBool := preferencesConfig.GetPreferenceBool("Heart_Pieces")
     heart_PiecesCheck := widget.NewCheck("Heart Pieces", func(value bool) {
       heart_PiecesBool = value
     })
-    heart_PiecesCheck.Checked = preferencesConfig.GetBool("Heart_Pieces")
+    heart_PiecesCheck.Checked = preferencesConfig.GetPreferenceBool("Heart_Pieces")
     heart_PiecesContainer := container.NewVBox(heart_PiecesCheck)
 
-    chest_CountBool := preferencesConfig.GetBool("Chest_Count")
+    chest_CountBool := preferencesConfig.GetPreferenceBool("Chest_Count")
     chest_CountCheck := widget.NewCheck("Track Dungeon Chests", func(value bool) {
       chest_CountBool = value
     })
-    chest_CountCheck.Checked = preferencesConfig.GetBool("Chest_Count")
+    chest_CountCheck.Checked = preferencesConfig.GetPreferenceBool("Chest_Count")
     chest_CountContainer := container.NewVBox(chest_CountCheck)
 
-    mapsBool := preferencesConfig.GetBool("Maps")
+    mapsBool := preferencesConfig.GetPreferenceBool("Maps")
     mapsCheck := widget.NewCheck("Maps", func(value bool) {
       mapsBool = value
     })
-    mapsCheck.Checked = preferencesConfig.GetBool("Maps")
+    mapsCheck.Checked = preferencesConfig.GetPreferenceBool("Maps")
     mapsContainer := container.NewVBox(mapsCheck)
 
-    compassesBool := preferencesConfig.GetBool("Compasses")
+    compassesBool := preferencesConfig.GetPreferenceBool("Compasses")
     compassesCheck := widget.NewCheck("Compasses", func(value bool) {
       compassesBool = value
     })
-    compassesCheck.Checked = preferencesConfig.GetBool("Compasses")
+    compassesCheck.Checked = preferencesConfig.GetPreferenceBool("Compasses")
     compassesContainer := container.NewVBox(compassesCheck)
 
-    keysBool := preferencesConfig.GetBool("Keys")
+    keysBool := preferencesConfig.GetPreferenceBool("Keys")
     keysCheck := widget.NewCheck("Small Keys", func(value bool) {
       keysBool = value
     })
-    keysCheck.Checked = preferencesConfig.GetBool("Keys")
+    keysCheck.Checked = preferencesConfig.GetPreferenceBool("Keys")
     keysContainer := container.NewVBox(keysCheck)
 
-    big_KeysBool := preferencesConfig.GetBool("Big_Keys")
+    big_KeysBool := preferencesConfig.GetPreferenceBool("Big_Keys")
     big_KeysCheck := widget.NewCheck("Big Keys", func(value bool) {
       big_KeysBool = value
     })
-    big_KeysCheck.Checked = preferencesConfig.GetBool("Big_Keys")
+    big_KeysCheck.Checked = preferencesConfig.GetPreferenceBool("Big_Keys")
     big_KeysContainer := container.NewVBox(big_KeysCheck)
 
-    bossBool := preferencesConfig.GetBool("Bosses")
+    bossBool := preferencesConfig.GetPreferenceBool("Bosses")
     bossCheck := widget.NewCheck("Bosses", func(value bool) {
       bossBool = value
     })
-    bossCheck.Checked = preferencesConfig.GetBool("Bosses")
+    bossCheck.Checked = preferencesConfig.GetPreferenceBool("Bosses")
     bossContainer := container.NewVBox(bossCheck)
     mainWindow.Hide()
 
     applyButton := widget.NewButton("Apply Changes", func() {
-      preferencesConfig.Set("Bombs", bombBool)
-      preferencesConfig.Set("Progressive_Bows", progressive_BowsBool)
-      preferencesConfig.Set("Bottle_Full", bottle_FullBool)
-      preferencesConfig.Set("Pseudo_Boots", pseudo_BootsBool)
-      preferencesConfig.Set("Sword", swordBool)
-      preferencesConfig.Set("Shield", shieldBool)
-      preferencesConfig.Set("Mail", mailBool)
-      preferencesConfig.Set("HalfMagic", halfMagicBool)
-      preferencesConfig.Set("Heart_Pieces", heart_PiecesBool)
-      preferencesConfig.Set("Chest_Count", chest_CountBool)
-      preferencesConfig.Set("Maps", mapsBool)
-      preferencesConfig.Set("Compasses", compassesBool)
-      preferencesConfig.Set("Keys", keysBool)
-      preferencesConfig.Set("Big_Keys", big_KeysBool)
-      preferencesConfig.Set("Bosses", bossBool)
-      preferencesConfig.WriteConfig()
+      preferencesConfig.SetPreference("Bombs", bombBool)
+      preferencesConfig.SetPreference("Bottle_Full", bottle_FullBool)
+      preferencesConfig.SetPreference("Sword", swordBool)
+      preferencesConfig.SetPreference("Shield", shieldBool)
+      preferencesConfig.SetPreference("Mail", mailBool)
+      preferencesConfig.SetPreference("HalfMagic", halfMagicBool)
+      preferencesConfig.SetPreference("Heart_Pieces", heart_PiecesBool)
+      preferencesConfig.SetPreference("Chest_Count", chest_CountBool)
+      preferencesConfig.SetPreference("Maps", mapsBool)
+      preferencesConfig.SetPreference("Compasses", compassesBool)
+      preferencesConfig.SetPreference("Keys", keysBool)
+      preferencesConfig.SetPreference("Big_Keys", big_KeysBool)
+      preferencesConfig.SetPreference("Bosses", bossBool)
+      preferencesConfig.SavePreferences()
       inventory.PreferencesUpdate()
       dungeon.PreferencesUpdate()
       prefWindow.Close()
@@ -189,8 +294,8 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
     })
 
     buttonContainer := container.NewHBox(applyButton, cancelButton)
-    preferencesContainer := container.New(layout.NewGridLayout(1), progressive_BowsContainer, bombContainer, bottle_FullContainer,
-      pseudo_BootsContainer, swordContainer, shieldContainer, mailContainer, halfMagicContainer, heart_PiecesContainer,  
+    preferencesContainer := container.New(layout.NewGridLayout(1), bombContainer, bottle_FullContainer,
+      swordContainer, shieldContainer, mailContainer, halfMagicContainer, heart_PiecesContainer,  
       chest_CountContainer, mapsContainer, compassesContainer, keysContainer, big_KeysContainer, bossContainer)
     mainContainer := container.NewVBox(preferencesContainer, buttonContainer)
     scrollContainer := container.NewVScroll(mainContainer)
