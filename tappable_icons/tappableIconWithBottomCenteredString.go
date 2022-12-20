@@ -49,7 +49,7 @@ func NewTappableIconWithBottomCenteredString(res []fyne.Resource, size float32, 
 
   icon := &TappableIconWithBottomCenteredString{
     resources: res,
-    current: 0,
+    current: -1,
     text: "?",
     obtained: false,
     tapSize: size,
@@ -68,9 +68,9 @@ func NewTappableIconWithBottomCenteredString(res []fyne.Resource, size float32, 
 
 func (t *TappableIconWithBottomCenteredString) Update() {
   t.current = t.saveFile.GetSaveInt(t.saveFileText + "_Current")
-  t.current = intRangeCheck(t.current, 8, 0)
+  t.current = intRangeCheck(t.current, 8, -1)
   t.toolTipText = tooltip.GetToolTipText(t.resources[0].Name())
-  if t.current == 0 {
+  if t.current == -1 {
     t.text = "?"
   } else if t.current == 8 {
     t.text = "AD"
@@ -88,12 +88,12 @@ func (t *TappableIconWithBottomCenteredString) Update() {
 }
 
 func (t *TappableIconWithBottomCenteredString) SetSaveDefaults() {
-  t.saveFile.SetDefault(t.saveFileText + "_Current", 0)
+  t.saveFile.SetDefault(t.saveFileText + "_Current", 7)
   t.saveFile.SetDefault(t.saveFileText + "_Obtained", false)
 }
 
 func (t *TappableIconWithBottomCenteredString) GetSaveDefaults() {
-  t.current = 0
+  t.current = 7
   t.obtained = false
   t.saveFile.SetSave(t.saveFileText + "_Current", t.current)
   t.saveFile.SetDefault(t.saveFileText + "_Obtained", t.obtained)
@@ -130,17 +130,14 @@ func (t *TappableIconWithBottomCenteredString) changeResource() {
 }
 
 func (t *TappableIconWithBottomCenteredString) increment() {
-  if t.current < (len(t.resources) - 1) {
-    t.current++
-    t.text = strconv.Itoa(t.current)
-  } else if t.current < 7 {
+if t.current < 7 {
     t.current++
     t.text = strconv.Itoa(t.current)
   } else if t.current == 7 {
     t.current ++
     t.text = "AD"
   } else {
-    t.current = 0
+    t.current = -1
     t.text = "?"
   }
   t.outlineText.Refresh(t.text)
@@ -149,10 +146,10 @@ func (t *TappableIconWithBottomCenteredString) increment() {
 }
 
 func (t *TappableIconWithBottomCenteredString) decrement() {
-  if t.current > 1 {
+  if t.current > 0 {
     t.current--
     t.text = strconv.Itoa(t.current)
-  } else if t.current == 1 {
+  } else if t.current == 0 {
     t.current--
     t.text = "?"
   } else {

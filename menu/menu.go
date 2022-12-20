@@ -2,10 +2,11 @@ package menu
 
 import (
 	"fmt"
-	"strconv"
-	"net/url"
-	"os"
+  "image/color"
   "math"
+  "net/url"
+  "os"
+  "strconv"
 
   "tracker/dungeon"
   "tracker/inventory"
@@ -14,6 +15,7 @@ import (
   "tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
+  "fyne.io/fyne/v2/canvas"
   "fyne.io/fyne/v2/container"
   "fyne.io/fyne/v2/layout"
   "fyne.io/fyne/v2/widget"
@@ -34,6 +36,32 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
   openCategory := func() {
     categoryWindow := myApp.NewWindow("Category Options")
     categoryWindow.Resize(mainWindow.Content().Size())
+
+    ganonGoalText := canvas.NewText("Ganon Crystal Requirement", color.White)
+    ganonGoalInt := saveConfig.GetSaveInt("Ganon Goal_Current")
+    ganonGoalSelect := widget.NewSelect([]string{"Unknown", "0", "1", "2", "3", "4", "5", "6", "7", "All Dungeons"}, func(value string) {
+      if value == "Unknown" {
+        ganonGoalInt = -1
+      } else if value == "All Dungeons" {
+        ganonGoalInt = 8
+      } else {
+        ganonGoalInt, _ = strconv.Atoi(value)
+      }
+    })
+    ganonGoalContainer := container.NewVBox(ganonGoalText, ganonGoalSelect)
+
+    categoryGoalText := canvas.NewText("Category Goal Type", color.White)
+    categoryGoalInt := preferencesConfig.GetPreferenceInt("Goal")
+    categoryGoalSelect := widget.NewSelect([]string{"Ganon Goal", "Master Sword Pedestal", "Triforce Pieces"}, func(value string) {
+      if value == "Ganon Goal" {
+        categoryGoalInt = 0
+      } else if value == "Master Sword Pedestal" {
+        categoryGoalInt = 1
+      } else if value == "Triforce Pieces" {
+        categoryGoalInt = 2
+      }
+    })
+    categoryGoalContainer := container.NewVBox(categoryGoalText, categoryGoalSelect)
 
     progressive_BowsBool := preferencesConfig.GetPreferenceBool("Progressive_Bows")
     progressive_BowsCheck := widget.NewCheck("Progressive Bows", func(value bool) {
@@ -72,6 +100,8 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
     mainWindow.Hide()
 
     applyButton := widget.NewButton("Apply Changes", func() {
+      inventory.UpdateGanonGoal(ganonGoalInt)
+      preferencesConfig.SetPreference("Goal", categoryGoalInt)
       preferencesConfig.SetPreference("Progressive_Bows", progressive_BowsBool)
       preferencesConfig.SetPreference("Pseudo_Boots", pseudo_BootsBool)
       preferencesConfig.SetPreference("Key_Requireds", keysBool)
@@ -87,8 +117,8 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
     })
 
     buttonContainer := container.NewHBox(applyButton, cancelButton)
-    categoryContainer := container.New(layout.NewGridLayout(1), progressive_BowsContainer,
-      pseudo_BootsContainer, keysContainer, big_KeysContainer, bossContainer)
+    categoryContainer := container.New(layout.NewGridLayout(1), ganonGoalContainer, categoryGoalContainer,
+      progressive_BowsContainer, pseudo_BootsContainer, keysContainer, big_KeysContainer, bossContainer)
     mainContainer := container.NewVBox(categoryContainer, buttonContainer)
     scrollContainer := container.NewVScroll(mainContainer)
 
