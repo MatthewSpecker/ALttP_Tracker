@@ -1,0 +1,29 @@
+#!/bin/bash
+fyne bundle -package tappable_icons ../icons/ArmosGray.png > bundled.go
+fyne bundle -package tappable_icons -append ../icons/Armos.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/ArrghusGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Arrghus.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/BlindGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Blind.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Blue_CrystalGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Blue_Crystal.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Blue_Red_PendantGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Blue_Red_Pendant.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Green_PendantGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Green_Pendant.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/HelmasaurGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Helmasaur.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/KholdstareGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Kholdstare.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/LanmolasGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Lanmolas.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/MoldormGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Moldorm.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/MothulaGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Mothula.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Red_CrystalGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Red_Crystal.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/TrinexxGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Trinexx.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/VitreousGray.png >> bundled.go
+fyne bundle -package tappable_icons -append ../icons/Vitreous.png >> bundled.go
