@@ -1,7 +1,7 @@
 package text_outline
 
 import (
-  "fyne.io/fyne/v2"
+	"fyne.io/fyne/v2"
 )
 
 type outlineLayout struct {
@@ -9,16 +9,16 @@ type outlineLayout struct {
 }
 
 func (o *outlineLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
-  w, h := float32(0), float32(0)
-  for _, element := range objects {
-    childSize := element.MinSize()
+	w, h := float32(0), float32(0)
+	for _, element := range objects {
+		childSize := element.MinSize()
 
-    w += childSize.Width + o.thickness
-    if childSize.Height > h {
-    	h = childSize.Height + o.thickness
-    }
-  }
-  return fyne.NewSize(w, h)
+		w += childSize.Width + o.thickness
+		if childSize.Height > h {
+			h = childSize.Height + o.thickness
+		}
+	}
+	return fyne.NewSize(w, h)
 }
 
 func (o *outlineLayout) Layout(objects []fyne.CanvasObject, containerSize fyne.Size) {
@@ -28,7 +28,6 @@ func (o *outlineLayout) Layout(objects []fyne.CanvasObject, containerSize fyne.S
 		element.Resize(size)
 		element.Move(pos)
 
-		pos = pos.Add(fyne.NewPos(size.Width + o.thickness, 0))
+		pos = pos.Add(fyne.NewPos(size.Width+o.thickness, 0))
 	}
 }
-
