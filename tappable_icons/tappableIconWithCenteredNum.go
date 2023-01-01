@@ -68,7 +68,7 @@ func NewTappableIconWithCenteredNum(res []fyne.Resource, num int, size float32, 
 	}
 
 	icon.toolTipText = tooltip.GetToolTipText(icon.resources[icon.current].Name())
-	icon.outlineText = text_outline.NewTextOutline(icon.text, icon.tapSize, 1.5, 6, color.White, color.Black)
+	icon.outlineText = text_outline.NewTextOutline(icon.text, icon.tapSize, 2, 6, color.White, color.Black)
 	icon.ExtendBaseWidget(icon)
 	icon.SetResource(icon.resources[icon.current])
 
@@ -105,7 +105,13 @@ func (t *TappableIconWithCenteredNum) GetSaveDefaults() {
 	t.Update()
 }
 
-func (t *TappableIconWithCenteredNum) LayoutAdjust() *fyne.Container {
+func (t *TappableIconWithCenteredNum) Layout() *fyne.Container {
+	tapIconContainer := t.layoutCenteredNum()
+	tapIconContainer = container.New(layout.NewCenterLayout(), tapIconContainer)
+	return tapIconContainer
+}
+
+func (t *TappableIconWithCenteredNum) layoutCenteredNum() *fyne.Container {
 	container1 := container.New(layout.NewCenterLayout(), t)
 	container2 := container.New(layout.NewCenterLayout(), t.outlineText.TextOutlineContainer)
 	container3 := container.NewWithoutLayout(container1, container2)

@@ -1,5 +1,9 @@
 package text_outline
 
+/*To Do:
+-Add descriptions to functions
+*/
+
 import (
 	"fyne.io/fyne/v2"
 )

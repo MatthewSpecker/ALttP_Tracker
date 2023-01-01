@@ -1,5 +1,9 @@
 package save
 
+/*To Do:
+-Add descriptions to functions
+*/
+
 import (
 	"fmt"
 
@@ -20,11 +24,10 @@ func NewSaveFile() *SaveFile {
 
 func loadState() *viper.Viper {
 	config := viper.New()
-	config.SetConfigName("save") // name of config file (without extension)
-	config.SetConfigType("toml") // REQUIRED if the config file does not have the extension in the name
-	//config.AddConfigPath("/save")   // path to look for the config file in
-	config.AddConfigPath("./save") // optionally look for config in the working directory
-	err := config.ReadInConfig()   // Find and read the config file
+	config.SetConfigName("save")
+	config.SetConfigType("toml")
+	config.AddConfigPath("./save")
+	err := config.ReadInConfig()
 
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {

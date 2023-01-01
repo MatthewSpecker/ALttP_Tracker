@@ -1,6 +1,13 @@
 package undo_redo
 
+/*To Do:
+-Convert from Stacks to Doubly Linked Lists
+-Add descriptions to functions
+*/
+
 import ()
+
+const undoHistoryLength = 50
 
 type UndoRedoStacks struct {
 	undoStack      []func()
@@ -21,7 +28,7 @@ func NewUndoRedoStacks() *UndoRedoStacks {
 }
 
 func (u *UndoRedoStacks) StoreFunctions(undoFunc func(), redoFunc func()) {
-	if len(u.undoStack) >= 10 {
+	if len(u.undoStack) >= undoHistoryLength {
 		u.undoStack[0] = nil
 		u.undoStack = u.undoStack[1:]
 		u.redoStackStore[0] = nil
@@ -57,7 +64,7 @@ func (u *UndoRedoStacks) Redo() {
 		u.undoStackOld[len(u.undoStackOld)-1] = nil
 		u.undoStackOld = u.undoStackOld[:len(u.undoStackOld)-1]
 
-		if len(u.undoStack) >= 10 {
+		if len(u.undoStack) >= undoHistoryLength {
 			u.undoStack[0] = nil
 			u.undoStack = u.undoStack[1:]
 			u.redoStackStore[0] = nil

@@ -10,7 +10,9 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -81,6 +83,11 @@ func (t *TappablePrizeIcon) GetSaveDefaults() {
 	t.saveFile.SetSave(t.saveFileText+"_Obtained", t.obtained)
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
 	t.Update()
+}
+
+func (t *TappablePrizeIcon) Layout() *fyne.Container {
+	tapIconContainer := container.New(layout.NewCenterLayout(), t)
+	return tapIconContainer
 }
 
 func (t *TappablePrizeIcon) MinSize() fyne.Size {

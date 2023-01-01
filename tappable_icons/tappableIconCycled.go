@@ -10,7 +10,9 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -71,6 +73,11 @@ func (t *TappableIconCycled) GetSaveDefaults() {
 	t.current = 0
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
 	t.Update()
+}
+
+func (t *TappableIconCycled) Layout() *fyne.Container {
+	tapIconContainer := container.New(layout.NewCenterLayout(), t)
+	return tapIconContainer
 }
 
 func (t *TappableIconCycled) MinSize() fyne.Size {

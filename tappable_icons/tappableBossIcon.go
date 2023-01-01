@@ -10,7 +10,9 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -87,6 +89,11 @@ func (t *TappableBossIcon) GetSaveDefaults() {
 	t.current = t.bossStart
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
 	t.Update()
+}
+
+func (t *TappableBossIcon) Layout() *fyne.Container {
+	tapIconContainer := container.New(layout.NewCenterLayout(), t)
+	return tapIconContainer
 }
 
 func (t *TappableBossIcon) MinSize() fyne.Size {

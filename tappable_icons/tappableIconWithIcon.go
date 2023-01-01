@@ -92,7 +92,13 @@ func (t *TappableIconWithIcon) GetSaveDefaults() {
 	t.Update()
 }
 
-func (t *TappableIconWithIcon) LayoutAdjust() *fyne.Container {
+func (t *TappableIconWithIcon) Layout() *fyne.Container {
+	tapIconContainer := t.layoutIcon()
+	tapIconContainer = container.New(layout.NewCenterLayout(), tapIconContainer)
+	return tapIconContainer
+}
+
+func (t *TappableIconWithIcon) layoutIcon() *fyne.Container {
 	container1 := container.New(layout.NewCenterLayout(), t)
 	container2 := container.New(layout.NewCenterLayout(), t.iconSmall)
 	container3 := container.NewWithoutLayout(container1, container2)

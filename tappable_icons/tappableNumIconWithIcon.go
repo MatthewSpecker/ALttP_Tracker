@@ -135,7 +135,13 @@ func (t *TappableNumIconWithIcon) GetSaveDefaults() {
 	t.Update()
 }
 
-func (t *TappableNumIconWithIcon) LayoutAdjust() *fyne.Container {
+func (t *TappableNumIconWithIcon) Layout() *fyne.Container {
+	tapIconContainer := t.layoutIcon()
+	tapIconContainer = container.New(layout.NewCenterLayout(), tapIconContainer)
+	return tapIconContainer
+}
+
+func (t *TappableNumIconWithIcon) layoutIcon() *fyne.Container {
 	container1 := container.New(layout.NewCenterLayout(), t)
 	container2 := container.New(layout.NewCenterLayout(), t.text)
 	container3 := container.New(layout.NewMaxLayout(), t.iconSmall)

@@ -26,8 +26,8 @@ type dungeonIcons struct {
 	keyTapIcon             *tappable_icons.TappableNumIconWithIcon
 	bigKeyTapIcon          *tappable_icons.TappableIcon
 	bossTapIcon            *tappable_icons.TappableBossIcon
-	preferencesFile        *preferences.PreferencesFile
-	saveFile               *save.SaveFile
+	preferencesConfig      *preferences.PreferencesFile
+	saveConfig             *save.SaveFile
 	prizeBool              bool
 	bossBool               bool
 	bossInt                int
@@ -66,15 +66,15 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 
 	var err error
 	dungeon := &dungeonIcons{
-		preferencesFile: preferencesConfig,
-		saveFile:        saveConfig,
-		prizeBool:       prizeBool,
-		bossBool:        bossBool,
-		bossInt:         bossInt,
-		mapBool:         mapBool,
-		compassBool:     compassBool,
-		bigKeyBool:      bigKeyBool,
-		keys:            keys,
+		preferencesConfig: 	preferencesConfig,
+		saveConfig:        	saveConfig,
+		prizeBool:       	prizeBool,
+		bossBool:        	bossBool,
+		bossInt:         	bossInt,
+		mapBool:         	mapBool,
+		compassBool:     	compassBool,
+		bigKeyBool:      	bigKeyBool,
+		keys:            	keys,
 	}
 
 	dungeon.nameText = canvas.NewText(name, color.White)
@@ -99,29 +99,6 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 		}
 	}
 
-	var mapInt, compassInt, keyInt, bigKeyInt int
-	if preferencesConfig.GetPreferenceBool("Maps") || mapBool == false {
-		mapInt = 0
-	} else {
-		mapInt = 1
-	}
-	if preferencesConfig.GetPreferenceBool("Compasses") || compassBool == false {
-		compassInt = 0
-	} else {
-		compassInt = 1
-	}
-	if preferencesConfig.GetPreferenceBool("Keys") {
-		keyInt = 0
-	} else {
-		keyInt = 1
-	}
-	if preferencesConfig.GetPreferenceBool("Big_Keys") || bigKeyBool == false {
-		bigKeyInt = 0
-	} else {
-		bigKeyInt = 1
-	}
-
-	chestCount := totalChecks - keys*(keyInt) - bigKeyInt - mapInt - compassInt
 	dungeon.chestTapIcon, err = tappable_icons.NewTappableNumIconWithIcon([]fyne.Resource{resourceChestPng, resourceEmptyChestPng}, chestCount, false, 16*scaleConstant, undoStack, saveConfig, name+"_Chest")
 	if err != nil {
 		return nil, fmt.Errorf("Encountered error making chestTapIcon: %w", err)
@@ -163,6 +140,33 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 	return dungeon, nil
 }
 
+func (d *dungeonIcons) calculateChestCount() int {
+	var mapInt, compassInt, keyInt, bigKeyInt int
+	if d.preferencesConfig.GetPreferenceBool("Maps") || d.mapBool == false {
+		mapInt = 0
+	} else {
+		mapInt = 1
+	}
+	if d.preferencesConfig.GetPreferenceBool("Compasses") || d.compassBool == false {
+		compassInt = 0
+	} else {
+		compassInt = 1
+	}
+	if d.preferencesConfig.GetPreferenceBool("Keys") {
+		keyInt = 0
+	} else {
+		keyInt = 1
+	}
+	if d.preferencesConfig.GetPreferenceBool("Big_Keys") || d.bigKeyBool == false {
+		bigKeyInt = 0
+	} else {
+		bigKeyInt = 1
+	}
+
+	chestCount := d.totalChecks - d.keys*(keyInt) - bigKeyInt - mapInt - compassInt
+	return chestCount
+}
+
 func (d *dungeonIcons) layout() []*fyne.Container {
 	d.DungeonRow = []*fyne.Container{}
 
@@ -171,47 +175,45 @@ func (d *dungeonIcons) layout() []*fyne.Container {
 	d.DungeonRow = append(d.DungeonRow, d.nameTextContainer)
 
 	if d.prizeBool && d.bossBool {
-		d.prizeTapContainer = container.New(layout.NewCenterLayout(), d.prizeTapIcon)
+		d.prizeTapContainer = d.prizeTapIcon.Layout()
 	} else if d.prizeBool && d.bossBool == false {
-		d.prizeTapContainer = container.New(layout.NewCenterLayout(), d.completionTapIcon)
+		d.prizeTapContainer = d.completionTapIcon.Layout()
 	} else {
-		d.prizeTapContainer = container.New(layout.NewCenterLayout(), layout.NewSpacer())
+		d.prizeTapContainer = createSpacer()
 	}
 	d.DungeonRow = append(d.DungeonRow, d.prizeTapContainer)
 
-	chestTapContainedIcon := d.chestTapIcon.LayoutAdjust()
-	d.chestTapContainer = container.New(layout.NewCenterLayout(), chestTapContainedIcon)
+	d.chestTapContainer = d.chestTapIcon.Layout()
 	d.DungeonRow = append(d.DungeonRow, d.chestTapContainer)
 
 	if d.mapBool {
-		d.mapTapContainer = container.New(layout.NewCenterLayout(), d.mapTapIcon)
+		d.mapTapContainer = d.mapTapIcon.Layout()
 	} else {
-		d.mapTapContainer = container.New(layout.NewCenterLayout(), layout.NewSpacer())
+		d.mapTapContainer = createSpacer()
 	}
 	d.DungeonRow = append(d.DungeonRow, d.mapTapContainer)
 
 	if d.compassBool {
-		d.compassTapContainer = container.New(layout.NewCenterLayout(), d.compassTapIcon)
+		d.compassTapContainer = d.compassTapIcon.Layout()
 	} else {
-		d.compassTapContainer = container.New(layout.NewCenterLayout(), layout.NewSpacer())
+		d.compassTapContainer = createSpacer()
 	}
 	d.DungeonRow = append(d.DungeonRow, d.compassTapContainer)
 
-	keyTapContainedIcon := d.keyTapIcon.LayoutAdjust()
-	d.keyTapContainer = container.New(layout.NewCenterLayout(), keyTapContainedIcon)
+	d.keyTapContainer = d.keyTapIcon.Layout()
 	d.DungeonRow = append(d.DungeonRow, d.keyTapContainer)
 
 	if d.bigKeyBool {
-		d.bigKeyTapContainer = container.New(layout.NewCenterLayout(), d.bigKeyTapIcon)
+		d.bigKeyTapContainer = d.bigKeyTapIcon.Layout()
 	} else {
-		d.bigKeyTapContainer = container.New(layout.NewCenterLayout(), layout.NewSpacer())
+		d.bigKeyTapContainer = createSpacer()
 	}
 	d.DungeonRow = append(d.DungeonRow, d.bigKeyTapContainer)
 
 	if d.bossBool {
-		d.bossTapContainer = container.New(layout.NewCenterLayout(), d.bossTapIcon)
+		d.bossTapContainer = d.bossTapIcon.Layout()
 	} else {
-		d.bossTapContainer = container.New(layout.NewCenterLayout(), layout.NewSpacer())
+		d.bossTapContainer = createSpacer()
 	}
 	d.DungeonRow = append(d.DungeonRow, d.bossTapContainer)
 
@@ -250,31 +252,31 @@ func (d *dungeonIcons) preferencesUpdate() {
 	if d.prizeBool == false {
 		colCounter--
 	}
-	if d.preferencesFile.GetPreferenceBool("Chest_Count") {
+	if d.preferencesConfig.GetPreferenceBool("Chest_Count") {
 		d.chestTapContainer.Show()
 	} else {
 		d.chestTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesFile.GetPreferenceBool("Maps") {
+	if d.preferencesConfig.GetPreferenceBool("Maps") {
 		d.mapTapContainer.Show()
 	} else {
 		d.mapTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesFile.GetPreferenceBool("Compasses") {
+	if d.preferencesConfig.GetPreferenceBool("Compasses") {
 		d.compassTapContainer.Show()
 	} else {
 		d.compassTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesFile.GetPreferenceBool("Keys") || d.preferencesFile.GetPreferenceBool("Keys_Required") {
+	if d.preferencesConfig.GetPreferenceBool("Keys") || d.preferencesConfig.GetPreferenceBool("Keys_Required") {
 		d.keyTapContainer.Show()
 	} else {
 		d.keyTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.preferencesFile.GetPreferenceBool("Big_Keys_Required") {
+	if d.preferencesConfig.GetPreferenceBool("Big_Keys") || d.preferencesConfig.GetPreferenceBool("Big_Keys_Required") {
 		d.bigKeyTapContainer.Show()
 		if d.bigKeyBool == false {
 			colCounter--
@@ -283,7 +285,7 @@ func (d *dungeonIcons) preferencesUpdate() {
 		d.bigKeyTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesFile.GetPreferenceBool("Bosses") || d.preferencesFile.GetPreferenceBool("Bosses_Required") {
+	if d.preferencesConfig.GetPreferenceBool("Bosses") || d.preferencesConfig.GetPreferenceBool("Bosses_Required") {
 		d.bossTapContainer.Show()
 		if d.bossBool == false {
 			colCounter--
@@ -356,4 +358,8 @@ func (d *dungeonIcons) restoreDefaults() {
 	if d.bossBool {
 		d.bossTapIcon.GetSaveDefaults()
 	}
+}
+
+func createSpacer() *fyne.Container {
+	return container.New(layout.NewCenterLayout(), layout.NewSpacer())
 }

@@ -1,5 +1,9 @@
 package preferences
 
+/*To Do:
+-Add descriptions to functions
+*/
+
 import (
 	"fmt"
 	"os"
@@ -29,11 +33,10 @@ func NewPreferencesFile() *PreferencesFile {
 
 func loadPreferences() *viper.Viper {
 	config := viper.New()
-	config.SetConfigName("preferences") // name of config file (without extension)
-	config.SetConfigType("toml")        // REQUIRED if the config file does not have the extension in the name
-	//config.AddConfigPath("")   // path to look for the config file in
-	config.AddConfigPath(".")    // optionally look for config in the working directory
-	err := config.ReadInConfig() // Find and read the config file
+	config.SetConfigName("preferences")
+	config.SetConfigType("toml")
+	config.AddConfigPath(".")
+	err := config.ReadInConfig()
 
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {

@@ -1,12 +1,17 @@
 package text_outline
 
+/*To Do:
+-Add descriptions to functions
+-Add default parameters to NewTextOutline
+-Make NewTextOutline parameters easier to understand (primarily size, thick, and dense)
+*/
+
 import (
 	"image/color"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	//"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 )
 
