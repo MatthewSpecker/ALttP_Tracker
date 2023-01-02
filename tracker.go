@@ -18,7 +18,7 @@ import (
 func displayMainWindowContent(mainWindow fyne.Window, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
 	mainGrid := container.NewHBox(inventory.Layout(), dungeon.Layout())
 
-	mainWindow.SetContent(mainGrid) 
+	mainWindow.SetContent(mainGrid)
 }
 
 func main() {

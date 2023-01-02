@@ -1,17 +1,17 @@
 package keyboard
 
 import (
-	//"fmt"
+//"fmt"
 
-	//"tracker/dungeon"
-	//"tracker/inventory"
-	//"tracker/menu"
-	//"tracker/preferences"
-	//"tracker/save"
-	//"tracker/undo_redo"
+//"tracker/dungeon"
+//"tracker/inventory"
+//"tracker/menu"
+//"tracker/preferences"
+//"tracker/save"
+//"tracker/undo_redo"
 
-	//"fyne.io/fyne/v2"
-	//"golang.design/x/hotkey"
+// "fyne.io/fyne/v2"
+// "golang.design/x/hotkey"
 )
 
 /*func inputCompare(input []string, shortcut []string) bool {

@@ -67,16 +67,16 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 
 	var err error
 	dungeon := &dungeonIcons{
-		preferencesConfig: 	preferencesConfig,
-		saveConfig:        	saveConfig,
-		prizeBool:       	prizeBool,
-		bossBool:        	bossBool,
-		bossInt:         	bossInt,
-		mapBool:         	mapBool,
-		compassBool:     	compassBool,
-		bigKeyBool:      	bigKeyBool,
-		keys:            	keys,
-		totalChecks:		totalChecks,
+		preferencesConfig: preferencesConfig,
+		saveConfig:        saveConfig,
+		prizeBool:         prizeBool,
+		bossBool:          bossBool,
+		bossInt:           bossInt,
+		mapBool:           mapBool,
+		compassBool:       compassBool,
+		bigKeyBool:        bigKeyBool,
+		keys:              keys,
+		totalChecks:       totalChecks,
 	}
 
 	dungeon.nameText = canvas.NewText(name, color.White)

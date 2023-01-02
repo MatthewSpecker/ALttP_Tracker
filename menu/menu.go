@@ -125,7 +125,7 @@ func fullScreen(mainWindow fyne.Window, fullScreenItem *fyne.MenuItem, main *fyn
 	main.Refresh()
 }
 
-func openMode (myApp fyne.App, mainWindow fyne.Window, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
+func openMode(myApp fyne.App, mainWindow fyne.Window, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
 	modeWindow := myApp.NewWindow("Mode Options")
 	modeWindow.Resize(mainWindow.Content().Size())
 
@@ -157,11 +157,11 @@ func openMode (myApp fyne.App, mainWindow fyne.Window, preferencesConfig *prefer
 
 	modeContainer := container.NewVBox(ganonGoalContainer, modeGoalContainer)
 
-	modeChecks := [][]string {{"Progressive_Bows", "Progressive Bows"}, {"Pseudo_Boots", "Pseudo Boots"}, {"Keys_Required", "Shuffled Small Keys"},
-	{"Big_Keys_Required", "Shuffled Big Keys"}, {"Bosses_Required", "Shuffled Bosses"}}
+	modeChecks := [][]string{{"Progressive_Bows", "Progressive Bows"}, {"Pseudo_Boots", "Pseudo Boots"}, {"Keys_Required", "Shuffled Small Keys"},
+		{"Big_Keys_Required", "Shuffled Big Keys"}, {"Bosses_Required", "Shuffled Bosses"}}
 
-	prefBool := []bool {}
-	prefCheck := []*widget.Check {}
+	prefBool := []bool{}
+	prefCheck := []*widget.Check{}
 	for index, element := range modeChecks {
 		prefBool = append(prefBool, preferencesConfig.GetPreferenceBool(element[0]))
 		currIndex := index
@@ -199,19 +199,19 @@ func openMode (myApp fyne.App, mainWindow fyne.Window, preferencesConfig *prefer
 	modeWindow.SetOnClosed(mainWindow.Show)
 }
 
-func openPreferences (myApp fyne.App, mainWindow fyne.Window, preferencesConfig *preferences.PreferencesFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
+func openPreferences(myApp fyne.App, mainWindow fyne.Window, preferencesConfig *preferences.PreferencesFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
 	prefWindow := myApp.NewWindow("App Preferences")
 	prefWindow.Resize(mainWindow.Content().Size())
 
 	preferencesContainer := container.NewVBox()
 
-	prefChecks := [][]string {{"Bombs", "Bombs"}, {"Bottle_Full", "Track Potions"}, {"Sword", "Sword"},
-	{"Shield", "Shield"}, {"Mail", "Mail"}, {"HalfMagic", "Half-Magic"}, {"Heart_Pieces", "Heart Pieces"}, 
-	{"Chest_Count", "Track Dungeon Chests"}, {"Maps", "Maps"}, {"Compasses", "Compasses"},
-	{"Keys", "Small Keys"}, {"Big_Keys", "Big Keys"}, {"Bosses", "Bosses"}}
+	prefChecks := [][]string{{"Bombs", "Bombs"}, {"Bottle_Full", "Track Potions"}, {"Sword", "Sword"},
+		{"Shield", "Shield"}, {"Mail", "Mail"}, {"HalfMagic", "Half-Magic"}, {"Heart_Pieces", "Heart Pieces"},
+		{"Chest_Count", "Track Dungeon Chests"}, {"Maps", "Maps"}, {"Compasses", "Compasses"},
+		{"Keys", "Small Keys"}, {"Big_Keys", "Big Keys"}, {"Bosses", "Bosses"}}
 
-	prefBool := []bool {}
-	prefCheck := []*widget.Check {}
+	prefBool := []bool{}
+	prefCheck := []*widget.Check{}
 	for index, element := range prefChecks {
 		prefBool = append(prefBool, preferencesConfig.GetPreferenceBool(element[0]))
 		currIndex := index
@@ -314,7 +314,7 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
 		dungeon.PreferencesUpdate()
 	})
 	additionalOptionsItem := fyne.NewMenuItem("Additional Options", nil)
-	additionalOptionsItem.Action = func () {
+	additionalOptionsItem.Action = func() {
 		openMode(myApp, mainWindow, preferencesConfig, saveConfig, inventory, dungeon)
 	}
 	additionalOptionsItem.Icon = theme.SettingsIcon()
@@ -329,7 +329,7 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
 	)
 
 	preferencesItem := fyne.NewMenuItem("Preferences", nil)
-	preferencesItem.Action = func () {
+	preferencesItem.Action = func() {
 		openPreferences(myApp, mainWindow, preferencesConfig, inventory, dungeon)
 	}
 	preferencesItem.Icon = theme.SettingsIcon()
