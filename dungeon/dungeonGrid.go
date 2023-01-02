@@ -35,10 +35,6 @@ type DungeonGrid struct {
 func NewDungeonGrid(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile) (*DungeonGrid, error) {
 	const scaleConstant = 3.0 / 5.0
 
-	if scaleConstant <= 0 {
-		return nil, errors.New("'scaleConstant' must be greater than 0")
-	}
-
 	var err error
 	grid := &DungeonGrid{
 		preferencesFile: preferencesConfig,
