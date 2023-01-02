@@ -35,6 +35,7 @@ type dungeonIcons struct {
 	compassBool            bool
 	bigKeyBool             bool
 	keys                   int
+	totalChecks            int
 	nameTextContainer      *fyne.Container
 	prizeTapContainer      *fyne.Container
 	completionTapContainer *fyne.Container
@@ -75,6 +76,7 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 		compassBool:     	compassBool,
 		bigKeyBool:      	bigKeyBool,
 		keys:            	keys,
+		totalChecks:		totalChecks,
 	}
 
 	dungeon.nameText = canvas.NewText(name, color.White)
@@ -99,6 +101,7 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 		}
 	}
 
+	chestCount := dungeon.calculateChestCount()
 	dungeon.chestTapIcon, err = tappable_icons.NewTappableNumIconWithIcon([]fyne.Resource{resourceChestPng, resourceEmptyChestPng}, chestCount, false, 16*scaleConstant, undoStack, saveConfig, name+"_Chest")
 	if err != nil {
 		return nil, fmt.Errorf("Encountered error making chestTapIcon: %w", err)

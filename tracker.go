@@ -30,12 +30,12 @@ func main() {
 	undoStack := undo_redo.NewUndoRedoStacks()
 	inventory, err := inventory.NewInventoryIcons(undoStack, preferencesConfig, saveConfig)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to make inventory: %w", err))
+		panic(fmt.Errorf("Failed to make inventory: %w", err))
 	}
 
 	dungeon, err := dungeon.NewDungeonGrid(undoStack, preferencesConfig, saveConfig)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to make dungeonGrid: %w", err))
+		panic(fmt.Errorf("Failed to make dungeonGrid: %w", err))
 	}
 
 	mainMenu := menu.MakeMenu(myApp, mainWindow, undoStack, preferencesConfig, saveConfig, inventory, dungeon)
