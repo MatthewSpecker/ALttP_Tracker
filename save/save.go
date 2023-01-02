@@ -6,6 +6,7 @@ package save
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
@@ -14,24 +15,24 @@ type SaveFile struct {
 	config *viper.Viper
 }
 
-func NewSaveFile() *SaveFile {
+func NewSaveFile(saveFileDirectory string) *SaveFile {
 	save := &SaveFile{
-		config: loadState(),
+		config: loadState(saveFileDirectory),
 	}
 
 	return save
 }
 
-func loadState() *viper.Viper {
+func loadState(saveFileDirectory string) *viper.Viper {
 	config := viper.New()
 	config.SetConfigName("save")
 	config.SetConfigType("toml")
-	config.AddConfigPath("./save")
+	config.AddConfigPath(saveFileDirectory)
 	err := config.ReadInConfig()
 
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			config.SafeWriteConfigAs("./save/save.toml")
+			config.SafeWriteConfigAs(filepath.Join(saveFileDirectory, "save.toml"))
 		} else {
 			panic(fmt.Errorf("fatal error save file: %w", err))
 		}
@@ -40,8 +41,8 @@ func loadState() *viper.Viper {
 	return config
 }
 
-func (s *SaveFile) SaveState() {
-	s.config.WriteConfig()
+func (s *SaveFile) SaveState() error {
+	return s.config.WriteConfig()
 }
 
 func (s *SaveFile) GetSaveInt(key string) int {
