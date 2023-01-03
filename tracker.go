@@ -26,7 +26,7 @@ func main() {
 	mainWindow := myApp.NewWindow("ALttP Randomizer Keyboard Tracker")
 	mainWindow.SetMaster()
 	saveConfig := save.NewSaveFile("./save/")
-	preferencesConfig := preferences.NewPreferencesFile()
+	preferencesConfig := preferences.NewPreferencesFile("./")
 	undoStack := undo_redo.NewUndoRedoStacks()
 	inventory, err := inventory.NewInventoryIcons(undoStack, preferencesConfig, saveConfig)
 	if err != nil {

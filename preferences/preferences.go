@@ -1,12 +1,9 @@
 package preferences
 
-/*To Do:
--Add descriptions to functions
-*/
-
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
@@ -15,9 +12,9 @@ type PreferencesFile struct {
 	config *viper.Viper
 }
 
-func NewPreferencesFile() *PreferencesFile {
+func NewPreferencesFile(preferencesFileDirectory string) *PreferencesFile {
 	preferences := &PreferencesFile{
-		config: loadPreferences(),
+		config: loadPreferences(preferencesFileDirectory),
 	}
 
 	preferences.CreateDefaults()
@@ -31,26 +28,26 @@ func NewPreferencesFile() *PreferencesFile {
 	return preferences
 }
 
-func loadPreferences() *viper.Viper {
+func loadPreferences(preferencesFileDirectory string) *viper.Viper {
 	config := viper.New()
 	config.SetConfigName("preferences")
 	config.SetConfigType("toml")
-	config.AddConfigPath(".")
+	config.AddConfigPath(preferencesFileDirectory)
 	err := config.ReadInConfig()
 
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			config.SafeWriteConfigAs("./preferences.toml")
+			config.SafeWriteConfigAs(filepath.Join(preferencesFileDirectory, "preferences.toml"))
 		} else {
-			panic(fmt.Errorf("fatal error save file: %w", err))
+			panic(fmt.Errorf("fatal error preferences file: %w", err))
 		}
 	}
 
 	return config
 }
 
-func (p *PreferencesFile) SavePreferences() {
-	p.config.WriteConfig()
+func (p *PreferencesFile) SavePreferences() error {
+	return p.config.WriteConfig()
 }
 
 func (p *PreferencesFile) GetPreferenceInt(key string) int {
@@ -65,8 +62,14 @@ func (p *PreferencesFile) GetPreferenceBool(key string) bool {
 	return p.config.GetBool(key)
 }
 
-func (p *PreferencesFile) SetPreference(key string, value interface{}) {
-	p.config.Set(key, value)
+func (p *PreferencesFile) SetPreference(key string, value interface{}) error {
+	switch value.(type) {
+	case bool, int, float64:
+		p.config.Set(key, value)
+		return nil
+	default:
+		return fmt.Errorf("%T is not an acceptable type to SetPreference. Must be string, bool/int/float64", value)
+	}
 }
 
 func (p *PreferencesFile) CreateDefaults() {

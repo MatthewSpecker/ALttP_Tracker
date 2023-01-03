@@ -1,18 +1,43 @@
-package dungeon
+package dungeon_test
 
 import (
-// "testing"
+	"testing"
+
+	"tracker/dungeon"
+	"tracker/preferences"
+	"tracker/save"
+	"tracker/undo_redo"
+
+	"fyne.io/fyne/v2/test"
 )
 
-/*func TestCalculateChestCount(t *testing.T) {
-	testIcon, err = newDungeonIcons(undoStack, preferencesConfig, saveConfig, scaleConstant, "TR", true, true, 9, true, true, true, 4, 12)
-	if err != nil {
-		return nil, fmt.Errorf("Encountered error making DungeonIcon for Test: %w", err)
-	}
-	got := dungeon.calculateChestCount(totalChecks)
-	want :=
+func TestNewDungeonGrid(t *testing.T) {
+	t.Parallel()
 
-	if got != want {
-		t.Errorf()
+	dungeon, err := dungeon.NewDungeonGrid(undo_redo.NewUndoRedoStacks(), preferences.NewPreferencesFile(t.TempDir()), save.NewSaveFile(t.TempDir()))
+	if err != nil {
+		t.Fatalf("Failed to make dungeonGrid: %v", err)
 	}
-}*/
+
+	if dungeon == nil  {
+		t.Error("got nil from NewDungeonGrid, but expected a DungeonGrid")
+	}
+}
+
+
+func TestLayout(t *testing.T) {
+	t.Parallel()
+
+	test.NewApp()
+
+	dungeon, err := dungeon.NewDungeonGrid(undo_redo.NewUndoRedoStacks(), preferences.NewPreferencesFile(t.TempDir()), save.NewSaveFile(t.TempDir()))
+	if err != nil {
+		t.Fatalf("Failed to make dungeonGrid: %v", err)
+	}
+
+	dungeonGrid := dungeon.Layout()
+
+	if dungeonGrid == nil  {
+		t.Error("got nil from Layout, but expected *fyne.Container")
+	}
+}

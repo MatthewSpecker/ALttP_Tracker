@@ -1,9 +1,5 @@
 package save
 
-/*To Do:
--Add descriptions to functions
-*/
-
 import (
 	"fmt"
 	"path/filepath"
@@ -55,22 +51,30 @@ func (s *SaveFile) GetSaveBool(key string) bool {
 	return s.config.GetBool(key)
 }
 
-func (s *SaveFile) SetSave(key string, value interface{}) {
+func (s *SaveFile) SetSave(key string, value interface{}) error {
 	switch value.(type) {
 	case bool:
 		key = key + "_Bool"
+		s.config.Set(key, value)
+		return nil
 	case int:
 		key = key + "_Int"
+		s.config.Set(key, value)
+		return nil
+	default:
+		return fmt.Errorf("%T is not an acceptable type to SetSave. Must be string, bool/int", value)
 	}
-
-	s.config.Set(key, value)
 }
 
-func (s *SaveFile) SetDefault(key string, value interface{}) {
+func (s *SaveFile) SetDefault(key string, value interface{}) error {
 	switch value.(type) {
 	case bool:
 		s.config.SetDefault(key+"_Bool", value)
+		return nil
 	case int:
 		s.config.SetDefault(key+"_Int", value)
+		return nil
+	default:
+		return fmt.Errorf("%T is not an acceptable type to SetDefault. Must be string, bool/int", value)
 	}
 }

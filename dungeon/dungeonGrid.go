@@ -1,7 +1,6 @@
 package dungeon
 
 import (
-	"errors"
 	"fmt"
 
 	"tracker/preferences"
@@ -160,16 +159,12 @@ func (d *DungeonGrid) Layout() *fyne.Container {
 		d.dungeonGrid.Add(element)
 	}
 
-	d.SaveUpdate()
+	d.saveUpdate()
 
 	return d.dungeonGrid
 }
 
-func (d *DungeonGrid) GetDungeonGrid() *fyne.Container {
-	return d.dungeonGrid
-}
-
-func (d *DungeonGrid) SaveUpdate() {
+func (d *DungeonGrid) saveUpdate() {
 	d.easternPalace.saveUpdate()
 	d.desertPalace.saveUpdate()
 	d.towerOfHera.saveUpdate()
