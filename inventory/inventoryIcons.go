@@ -59,6 +59,7 @@ type InventoryIcons struct {
 	ganonTowerGoalTapIcon          *tappable_icons.TappableIcon
 	preferencesFile                *preferences.PreferencesFile
 	saveFile                       *save.SaveFile
+	undoRedo				*undo_redo.UndoRedoStacks
 	bowTapContainer                *fyne.Container
 	bowNonProgressiveTapContainer  *fyne.Container
 	blueBoomerangTapContainer      *fyne.Container
@@ -109,6 +110,7 @@ func NewInventoryIcons(undoRedo *undo_redo.UndoRedoStacks, preferencesConfig *pr
 	inventory := &InventoryIcons{
 		preferencesFile: preferencesConfig,
 		saveFile:        saveConfig,
+		undoRedo:	undoRedo,
 	}
 	inventory.bowTapIcon, err = tappable_icons.NewTappableIcon([]fyne.Resource{resourceBowGrayPng, resourceBowPng, resourceBowSilversPng}, 15, undoRedo, saveConfig, "Bow")
 	if err != nil {
@@ -352,6 +354,96 @@ func (i *InventoryIcons) Layout() *fyne.Container {
 
 func (i *InventoryIcons) GetItemGrid() *fyne.Container {
 	return i.itemGrid
+}
+
+func (i *InventoryIcons) Keys(result int) {
+	if result == 0 {
+		i.bowTapIcon.Keyed()
+		i.bowNonProgressiveTapIcon.Keyed()
+	} else if result == 1 {
+		i.blueBoomerangTapIcon.Keyed()
+	} else if result == 2 {
+		i.redBoomerangTapIcon.Keyed()
+	} else if result == 3 {
+		i.hookshotTapIcon.Keyed()
+	} else if result == 4 {
+		i.bombTapIcon.Keyed()
+	} else if result == 5 {
+		i.mushroomTapIcon.Keyed()
+	} else if result == 6 {
+		i.magicPowderTapIcon.Keyed()
+	} else if result == 7 {
+		i.fireRodTapIcon.Keyed()
+	} else if result == 8 {
+		i.iceRodTapIcon.Keyed()
+	} else if result == 9 {
+		i.bombosTapIcon.Keyed()
+	} else if result == 10 {
+		i.etherTapIcon.Keyed()
+	} else if result == 11 {
+		i.quakeTapIcon.Keyed()
+	} else if result == 12 {
+		i.lampTapIcon.Keyed()
+	} else if result == 13 {
+		i.hammerTapIcon.Keyed()
+	} else if result == 14 {
+		i.fluteTapIcon.Keyed()
+	} else if result == 15 {
+		i.shovelTapIcon.Keyed()
+	} else if result == 16 {
+		i.bugNetTapIcon.Keyed()
+	} else if result == 17 {
+		i.bookOfMudoraTapIcon.Keyed()
+	} else if result == 18 {
+		i.bottleTotalTapIcon.Keyed()
+	} else if result == 19 {
+		i.bottle1TapIcon.Keyed()
+	} else if result == 20 {
+		i.bottle2TapIcon.Keyed()
+	} else if result == 21 {
+		i.bottle3TapIcon.Keyed()
+	} else if result == 22 {
+		i.bottle4TapIcon.Keyed()
+	} else if result == 23 {
+		i.caneOfSomariaTapIcon.Keyed()
+	} else if result == 24 {
+		i.caneOfByrnaTapIcon.Keyed()
+	} else if result == 25 {
+		i.magicCapeTapIcon.Keyed()
+	} else if result == 26 {
+		i.magicMirrorTapIcon.Keyed()
+	} else if result == 27 {
+		i.pegasusBootsTapIcon.Keyed()
+		i.pseudoPegasusBootsTapIcon.Keyed()
+	} else if result == 28 {
+		i.glovesTapIcon.Keyed()
+	} else if result == 29 {
+		i.flippersTapIcon.Keyed()
+	} else if result == 30 {
+		i.moonPearlTapIcon.Keyed()
+	} else if result == 31 {
+		i.swordTapIcon.Keyed()
+	} else if result == 32 {
+		i.shieldTapIcon.Keyed()
+	} else if result == 33 {
+		i.mailTapIcon.Keyed()
+	} else if result == 34 {
+		i.halfMagicTapIcon.Keyed()
+	} else if result == 35 {
+		i.heartPieceTapIcon.Keyed()
+	} else if result == 36 {
+		i.ganonGoalTapIcon.Keyed()
+	} else if result == 37 {
+		i.pedestalGoalTapIcon.Keyed()
+	} else if result == 38 {
+		i.triforceGoalTapIcon.Keyed()
+	} else if result == 39 {
+		i.ganonTowerGoalTapIcon.Keyed()
+	} else if result == 40 {
+		i.undoRedo.Undo()
+	} else if result == 41 {
+		i.undoRedo.Redo()
+	}
 }
 
 func (i *InventoryIcons) SaveUpdate() {

@@ -1,7 +1,5 @@
 package tappable_icons
 
-import ()
-
 func intRangeCheck(num int, max int, min int) int {
 	if num > max {
 		num = max

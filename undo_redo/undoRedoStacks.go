@@ -5,8 +5,6 @@ package undo_redo
 -Add descriptions to functions
 */
 
-import ()
-
 const undoHistoryLength = 50
 
 type UndoRedoStacks struct {

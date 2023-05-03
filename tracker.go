@@ -5,6 +5,7 @@ import (
 
 	"tracker/dungeon"
 	"tracker/inventory"
+	//"tracker/keyboard"
 	"tracker/menu"
 	"tracker/preferences"
 	"tracker/save"
@@ -44,6 +45,8 @@ func main() {
 	displayMainWindowContent(mainWindow, inventory, dungeon)
 
 	mainWindow.SetFullScreen(preferencesConfig.GetPreferenceBool("Fullscreen"))
+
+	//keyboard.KeyCheck(mainWindow, inventory)
 
 	mainWindow.ShowAndRun()
 	preferencesConfig.SetPreference("Fullscreen", mainWindow.FullScreen())
