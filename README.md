@@ -25,6 +25,6 @@ This application is written entirely in Golang using the Fyne GUI. I chose Golan
 - When the above are done, I would like to add entrance tracking and auto tracking.
 
 ## Other:
-I stream ALttPR ladder races at: https://www.twitch.tv/speckyspecks. I use my tracker on my stream if you wish to see it in action.
+I stream ALttPR races at: https://www.twitch.tv/speckyspecks. I use my tracker on my stream if you wish to see it in action.
 
 
