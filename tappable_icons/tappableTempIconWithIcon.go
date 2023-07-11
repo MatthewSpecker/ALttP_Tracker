@@ -77,7 +77,7 @@ func (t *TappableTempIconWithIcon) Update() {
 	} else if t.current > len(t.resources)-1 {
 		t.iconSmall.SetResource(t.smallResources[t.current-len(t.resources)])
 		t.toolTipText = tooltip.GetToolTipText(t.resources[len(t.resources)-1].Name())
-		t.SetResource(t.resources[len(t.resources)-1])
+		t.SetResource(t.resources[0])
 	} else {
 		resSmall, _ := fyne.LoadResourceFromPath("")
 		t.iconSmall.SetResource(resSmall)
@@ -109,7 +109,6 @@ func (t *TappableTempIconWithIcon) layoutIcon() *fyne.Container {
 	iconSize := t.Size()
 	iconChangePosition := fyne.NewPos(iconSize.Width/2, iconSize.Height/2)
 	container2.Move(iconChangePosition)
-	t.iconSmall.Resize(t.Size())
 
 	return container3
 }
@@ -125,10 +124,11 @@ func (t *TappableTempIconWithIcon) increment() {
 		t.Icon.SetResource(t.resources[t.current])
 	} else if t.current < len(t.smallResources)+len(t.resources)-1 {
 		t.current++
+		t.Icon.SetResource(t.resources[0])
 		t.iconSmall.SetResource(t.smallResources[t.current-len(t.resources)])
 	} else if t. current == len(t.smallResources)+len(t.resources)-1 {
 		t.current++
-		t.Icon.SetResource(t.resources[0])
+		t.Icon.SetResource(t.resources[len(t.resources)-1])
 	}
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
 }
@@ -136,12 +136,13 @@ func (t *TappableTempIconWithIcon) increment() {
 func (t *TappableTempIconWithIcon) decrement() {
 	if t.current == (len(t.resources) + len(t.smallResources)) {
 		t.current--
-		t.Icon.SetResource(t.resources[len(t.resources)-1])
+		t.Icon.SetResource(t.resources[0])
 	} else if t.current > len(t.resources) {
 		t.current--
 		t.iconSmall.SetResource(t.smallResources[t.current-len(t.resources)])
 	} else if t.current == len(t.resources) {
 		t.current--
+		t.Icon.SetResource(t.resources[len(t.resources)-1])
 		resSmall, _ := fyne.LoadResourceFromPath("")
 		t.iconSmall.SetResource(resSmall)
 	} else if t.current > 0 {

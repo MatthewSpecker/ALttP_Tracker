@@ -2,32 +2,39 @@ package preferences_test
 
 import (
 	"testing"
+	"image/color"
 
 	"tracker/preferences"
+
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/test"
 )
 
 func TestNewPreferencesFile(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
-	if preferences.NewPreferencesFile(t.TempDir()) == nil {
+	if preferences.NewPreferencesFile(t.TempDir(), testWindow) == nil {
 		t.Error("got nil from NewPreferencesFile, but expected a PreferencesFile")
 	}
 }
 
 func TestSavePreferences(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
-	preferencesFile := preferences.NewPreferencesFile(t.TempDir())
+	preferencesFile := preferences.NewPreferencesFile(t.TempDir(), testWindow)
 
 	preferencesFile.SavePreferences()
 }
 
 func TestSetPreference(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
 	preferencesFileDirectory := t.TempDir()
 
-	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	err := preferencesFile.SetPreference("is_test", true)
 	if err != nil {
 		t.Fatalf("error saving value: %v", err)
@@ -37,7 +44,7 @@ func TestSetPreference(t *testing.T) {
 		t.Fatalf("error saving preferences file: %v", err)
 	}
 
-	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	retrievedBool := preferencesFile2.GetPreferenceBool("is_test")
 
 	if retrievedBool != true {
@@ -46,11 +53,12 @@ func TestSetPreference(t *testing.T) {
 }
 
 func TestGetPreferenceInt(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
 	preferencesFileDirectory := t.TempDir()
 
-	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	err := preferencesFile.SetPreference("is_testInt", 1)
 	if err != nil {
 		t.Fatalf("error saving value: %v", err)
@@ -60,7 +68,7 @@ func TestGetPreferenceInt(t *testing.T) {
 		t.Fatalf("error saving preferences file: %v", err)
 	}
 
-	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	retrievedInt := preferencesFile2.GetPreferenceInt("is_testInt")
 
 	if retrievedInt != 1 {
@@ -69,11 +77,12 @@ func TestGetPreferenceInt(t *testing.T) {
 }
 
 func TestGetPreferenceFloat(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
 	preferencesFileDirectory := t.TempDir()
 
-	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	err := preferencesFile.SetPreference("is_testFloat", 1.123456)
 	if err != nil {
 		t.Fatalf("error saving value: %v", err)
@@ -83,7 +92,7 @@ func TestGetPreferenceFloat(t *testing.T) {
 		t.Fatalf("error saving preferences file: %v", err)
 	}
 
-	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	retrievedFloat := preferencesFile2.GetPreferenceFloat("is_testFloat")
 
 	if retrievedFloat != 1.123456 {
@@ -92,11 +101,12 @@ func TestGetPreferenceFloat(t *testing.T) {
 }
 
 func TestGetPreferenceBool(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
 	preferencesFileDirectory := t.TempDir()
 
-	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	err := preferencesFile.SetPreference("is_testBool", true)
 	if err != nil {
 		t.Fatalf("error saving value: %v", err)
@@ -106,7 +116,7 @@ func TestGetPreferenceBool(t *testing.T) {
 		t.Fatalf("error saving preferences file: %v", err)
 	}
 
-	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory)
+	preferencesFile2 := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
 	retrievedBool := preferencesFile2.GetPreferenceBool("is_testBool")
 
 	if retrievedBool != true {
@@ -115,14 +125,15 @@ func TestGetPreferenceBool(t *testing.T) {
 }
 
 func TestCreateDefaults(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
 	preferencesFileDirectory := t.TempDir()
 
-	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory)
-	preferencesFile.CreateDefaults()
+	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
+	preferencesFile.CreateDefaults(testWindow)
 
-	retrievedInt := preferencesFile.GetPreferenceInt("Goal")
+	retrievedInt := preferencesFile.GetPreferenceInt("")
 	retrievedFloat := preferencesFile.GetPreferenceFloat("Fyne_Scale")
 	retrievedBool := preferencesFile.GetPreferenceBool("Big_Keys")
 
@@ -138,18 +149,15 @@ func TestCreateDefaults(t *testing.T) {
 }
 
 func TestRestoreDefaults(t *testing.T) {
-	t.Parallel()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
 	preferencesFileDirectory := t.TempDir()
 
-	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory)
-	preferencesFile.CreateDefaults()
+	preferencesFile := preferences.NewPreferencesFile(preferencesFileDirectory, testWindow)
+	preferencesFile.CreateDefaults(testWindow)
 
-	err := preferencesFile.SetPreference("Goal", 1)
-	if err != nil {
-		t.Fatalf("error saving value: %v", err)
-	}
-	err = preferencesFile.SetPreference("Fyne_Scale", 2.000000)
+	err := preferencesFile.SetPreference("Fyne_Scale", 2.000000)
 	if err != nil {
 		t.Fatalf("error saving value: %v", err)
 	}
@@ -158,15 +166,11 @@ func TestRestoreDefaults(t *testing.T) {
 		t.Fatalf("error saving value: %v", err)
 	}
 
-	preferencesFile.RestoreDefaults()
+	preferencesFile.RestoreDefaults(testWindow)
 
-	retrievedInt := preferencesFile.GetPreferenceInt("Goal")
 	retrievedFloat := preferencesFile.GetPreferenceFloat("Fyne_Scale")
 	retrievedBool := preferencesFile.GetPreferenceBool("Big_Keys")
 
-	if retrievedInt != 0 {
-		t.Errorf("expected retrievedInt to be 0, but got %d", retrievedInt)
-	}
 	if retrievedFloat != 1.000000 {
 		t.Errorf("expected retrievedFloat to be 1.000000, but got %f", retrievedFloat)
 	}

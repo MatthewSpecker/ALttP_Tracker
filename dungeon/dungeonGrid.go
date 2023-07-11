@@ -262,6 +262,11 @@ func (d *DungeonGrid) ScreenUpdate() {
 	}
 }
 
+func (d *DungeonGrid) GetEasternPalaceRow() *fyne.Container {
+	//exists for testing purposes only
+	return d.easternPalace.chestTapContainer
+}
+
 func (d *DungeonGrid) CreateSaveDefaults() {
 	d.hyruleCastle.createSaveDefaults()
 	d.easternPalace.createSaveDefaults()

@@ -2,19 +2,25 @@ package dungeon_test
 
 import (
 	"testing"
+	"image/color"
 
 	"tracker/dungeon"
 	"tracker/preferences"
 	"tracker/save"
 	"tracker/undo_redo"
 
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/test"
 )
 
 func TestNewDungeonGrid(t *testing.T) {
 	t.Parallel()
 
-	dungeon, err := dungeon.NewDungeonGrid(undo_redo.NewUndoRedoStacks(), preferences.NewPreferencesFile(t.TempDir()), save.NewSaveFile(t.TempDir()))
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
+
+	var scale float32 = 1.0
+	dungeon, err := dungeon.NewDungeonGrid(scale, undo_redo.NewUndoRedoStacks(), preferences.NewPreferencesFile(t.TempDir(), testWindow), save.NewSaveFile(t.TempDir()))
 	if err != nil {
 		t.Fatalf("Failed to make dungeonGrid: %v", err)
 	}
@@ -27,9 +33,12 @@ func TestNewDungeonGrid(t *testing.T) {
 func TestLayout(t *testing.T) {
 	t.Parallel()
 
-	test.NewApp()
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
 
-	dungeon, err := dungeon.NewDungeonGrid(undo_redo.NewUndoRedoStacks(), preferences.NewPreferencesFile(t.TempDir()), save.NewSaveFile(t.TempDir()))
+	var scale float32 = 1.0
+
+	dungeon, err := dungeon.NewDungeonGrid(scale, undo_redo.NewUndoRedoStacks(), preferences.NewPreferencesFile(t.TempDir(), testWindow), save.NewSaveFile(t.TempDir()))
 	if err != nil {
 		t.Fatalf("Failed to make dungeonGrid: %v", err)
 	}
@@ -41,13 +50,16 @@ func TestLayout(t *testing.T) {
 	}
 }
 
-func TestPreferencesUpdate(t *testing.T) {
+func TestScreenUpdate(t *testing.T) {
 	t.Parallel()
 
-	test.NewApp()
-	preferences := preferences.NewPreferencesFile(t.TempDir())
+	text := canvas.NewText("test", color.White)
+	testWindow := test.NewWindow(text)
+	preferences := preferences.NewPreferencesFile(t.TempDir(), testWindow)
+	saves := save.NewSaveFile(t.TempDir())
+	var scale float32 = 1.0
 
-	dungeon, err := dungeon.NewDungeonGrid(undo_redo.NewUndoRedoStacks(), preferences, save.NewSaveFile(t.TempDir()))
+	dungeon, err := dungeon.NewDungeonGrid(scale, undo_redo.NewUndoRedoStacks(), preferences, saves)
 	if err != nil {
 		t.Fatalf("Failed to make dungeonGrid: %v", err)
 	}
@@ -56,10 +68,10 @@ func TestPreferencesUpdate(t *testing.T) {
 
 	preferences.SetPreference("Chest_Count", true)
 
-	dungeon.PreferencesUpdate()
-	dungeonRow := dungeon.easternPalace
+	dungeon.ScreenUpdate()
+	chest := dungeon.GetEasternPalaceRow()
 
-	if dungeonRow.chestTapContainer.Visible() != true {
+	if chest.Visible() != true {
 		t.Error("found Chest_Count to be hidden, but expected Chest_Count to be visible")
 	}
 }
