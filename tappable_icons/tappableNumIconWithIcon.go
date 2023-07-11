@@ -80,6 +80,7 @@ func NewTappableNumIconWithIcon(res []fyne.Resource, num int, increase bool, siz
 	icon.ExtendBaseWidget(icon)
 	resEmpty, _ := fyne.LoadResourceFromPath("")
 	icon.SetResource(resEmpty)
+	icon.iconSmall.Resize(icon.MinSize())
 
 	return icon, nil
 }
@@ -115,6 +116,48 @@ func (t *TappableNumIconWithIcon) Update() {
 
 	t.iconSmall.SetResource(t.resources[t.current])
 	t.text.Refresh()
+}
+
+func (t *TappableNumIconWithIcon) LogicUpdate(num int) error {
+	if num < 0 {
+		return errors.New("'num' must be a non-negative integer")
+	}
+	oldNumberMax := t.numberMax
+	t.numberMax = num
+	t.number = t.number + t.numberMax - oldNumberMax
+	if t.number < 0 {
+		t.number = 0
+	}
+	t.text.Text = strconv.Itoa(t.number)
+
+	if t.ascending {
+		if t.number == t.numberMax {
+			t.text.Color = color.NRGBA{R: 0, G: 255, B: 0, A: 255}
+		} else {
+			t.text.Color = color.White
+		}
+		if t.number == 0 && t.numberMax != 0 {
+			t.current = 0
+		} else {
+			t.current = 1
+		}
+	} else {
+		if t.number == 0 {
+			t.text.Color = color.NRGBA{R: 0, G: 255, B: 0, A: 255}
+		} else {
+			t.text.Color = color.White
+		}
+		if t.number == 0 {
+			t.current = 1
+		} else {
+			t.current = 0
+		}
+	}
+
+	t.iconSmall.SetResource(t.resources[t.current])
+	t.text.Refresh()
+
+	return nil
 }
 
 func (t *TappableNumIconWithIcon) SetSaveDefaults() {

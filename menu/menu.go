@@ -125,6 +125,11 @@ func fullScreen(mainWindow fyne.Window, fullScreenItem *fyne.MenuItem, main *fyn
 	main.Refresh()
 }
 
+func defaultWindowSize(mainWindow fyne.Window, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
+	mainGrid := container.NewHBox(inventory.Layout(), dungeon.Layout())
+	mainWindow.Resize(mainGrid.Size())
+}
+
 func openMode(myApp fyne.App, mainWindow fyne.Window, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
 	modeWindow := myApp.NewWindow("Mode Options")
 	modeWindow.Resize(mainWindow.Content().Size())
@@ -143,7 +148,7 @@ func openMode(myApp fyne.App, mainWindow fyne.Window, preferencesConfig *prefere
 	ganonGoalContainer := container.NewVBox(ganonGoalText, ganonGoalSelect)
 
 	modeGoalText := canvas.NewText("Mode Goal Type", color.White)
-	modeGoalInt := preferencesConfig.GetPreferenceInt("Goal")
+	modeGoalInt := saveConfig.GetSaveInt("Goal")
 	modeGoalSelect := widget.NewSelect([]string{"Ganon Goal", "Master Sword Pedestal", "Triforce Pieces"}, func(value string) {
 		if value == "Ganon Goal" {
 			modeGoalInt = 0
@@ -157,33 +162,33 @@ func openMode(myApp fyne.App, mainWindow fyne.Window, preferencesConfig *prefere
 
 	modeContainer := container.NewVBox(ganonGoalContainer, modeGoalContainer)
 
-	modeChecks := [][]string{{"Progressive_Bows", "Progressive Bows"}, {"Pseudo_Boots", "Pseudo Boots"}, {"Keys_Required", "Shuffled Small Keys"},
-		{"Big_Keys_Required", "Shuffled Big Keys"}, {"Bosses_Required", "Shuffled Bosses"}}
+	modeChecks := [][]string{{"Progressive_Bows", "Progressive Bows"}, {"Pseudo_Boots", "Pseudo Boots"}, {"Maps_Required", "Shuffled Maps"}, {"Compasses_Required", "Shuffled Compasses"}, 
+		{"Keys_Required", "Shuffled Small Keys"}, {"Big_Keys_Required", "Shuffled Big Keys"}, {"Bosses_Required", "Shuffled Bosses"}}
 
-	prefBool := []bool{}
-	prefCheck := []*widget.Check{}
+	modeBool := []bool{}
+	modeCheck := []*widget.Check{}
 	for index, element := range modeChecks {
-		prefBool = append(prefBool, preferencesConfig.GetPreferenceBool(element[0]))
+		modeBool = append(modeBool, saveConfig.GetSaveBool(element[0]))
 		currIndex := index
 		description := element[1]
-		prefCheck = append(prefCheck, widget.NewCheck(description, func(value bool) {
-			prefBool[currIndex] = value
+		modeCheck = append(modeCheck, widget.NewCheck(description, func(value bool) {
+			modeBool[currIndex] = value
 		}))
-		prefCheck[index].Checked = preferencesConfig.GetPreferenceBool(element[0])
-		modeContainer.Add(prefCheck[index])
+		modeCheck[index].Checked = saveConfig.GetSaveBool(element[0])
+		modeContainer.Add(modeCheck[index])
 	}
 
 	mainWindow.Hide()
 
 	applyButton := widget.NewButton("Apply Changes", func() {
-		inventory.UpdateGanonGoal(ganonGoalInt)
-		preferencesConfig.SetPreference("Goal", modeGoalInt)
+		saveConfig.SetSave("Ganon Goal_Current", ganonGoalInt)
+		saveConfig.SetSave("Goal", modeGoalInt)
 		for index, element := range modeChecks {
-			preferencesConfig.SetPreference(element[0], prefBool[index])
+			saveConfig.SetSave(element[0], modeBool[index])
 		}
-		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+		inventory.SaveUpdate()
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 		modeWindow.Close()
 	})
 	cancelButton := widget.NewButton("Cancel", func() {
@@ -230,8 +235,8 @@ func openPreferences(myApp fyne.App, mainWindow fyne.Window, preferencesConfig *
 			preferencesConfig.SetPreference(element[0], prefBool[index])
 		}
 		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 		prefWindow.Close()
 	})
 	cancelButton := widget.NewButton("Cancel", func() {
@@ -251,67 +256,71 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
 	modeItem := fyne.NewMenuItem("Mode", nil)
 	defaultModeItem := fyne.NewMenuItem("Default", func() {
 		//change ganon tower goal number to 7
-		inventory.UpdateGanonGoal(7)
-		preferencesConfig.SetPreference("Goal", 0)
-		preferencesConfig.SetPreference("Keys_Required", false)
-		preferencesConfig.SetPreference("Big_Keys_Required", false)
-		preferencesConfig.SetPreference("Bosses_Required", false)
-		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+		saveConfig.SetSave("Ganon Goal_Current", 7)
+		saveConfig.SetSave("Goal", 0)
+		saveConfig.SetSave("Maps_Required", false)
+		saveConfig.SetSave("Compasses_Required", false)
+		saveConfig.SetSave("Keys_Required", false)
+		saveConfig.SetSave("Big_Keys_Required", false)
+		saveConfig.SetSave("Bosses_Required", false)
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 	})
 	keysanityItem := fyne.NewMenuItem("Keysanity", func() {
 		//change ganon tower goal number to 7
-		inventory.UpdateGanonGoal(7)
-		preferencesConfig.SetPreference("Goal", 0)
-		preferencesConfig.SetPreference("Keys_Required", true)
-		preferencesConfig.SetPreference("Big_Keys_Required", true)
-		preferencesConfig.SetPreference("Bosses_Required", false)
-		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+		saveConfig.SetSave("Ganon Goal_Current", 7)
+		saveConfig.SetSave("Goal", 0)
+		saveConfig.SetSave("Maps_Required", true)
+		saveConfig.SetSave("Compasses_Required", true)
+		saveConfig.SetSave("Keys_Required", true)
+		saveConfig.SetSave("Big_Keys_Required", true)
+		saveConfig.SetSave("Bosses_Required", false)
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 	})
-	allDungeonsItem := fyne.NewMenuItem("All Dungeons", func() {
-		//change ganon tower goal number to 7
-		inventory.UpdateGanonGoal(8)
-		preferencesConfig.SetPreference("Goal", 0)
-		preferencesConfig.SetPreference("Keys_Required", false)
-		preferencesConfig.SetPreference("Big_Keys_Required", false)
-		preferencesConfig.SetPreference("Bosses_Required", false)
-		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+	allDungeonsItem := fyne.NewMenuItem("AD Keys", func() {
+		//change ganon tower goal number to AD
+		saveConfig.SetSave("Ganon Goal_Current", 8)
+		saveConfig.SetSave("Goal", 0)
+		saveConfig.SetSave("Maps_Required", true)
+		saveConfig.SetSave("Compasses_Required", true)
+		saveConfig.SetSave("Keys_Required", true)
+		saveConfig.SetSave("Big_Keys_Required", true)
+		saveConfig.SetSave("Bosses_Required", false)
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 	})
 	mapCompassBossShuffle := fyne.NewMenuItem("Map/Compass Boss Shuffle", func() {
 		//change ganon tower goal number to 7
-		inventory.UpdateGanonGoal(7)
-		preferencesConfig.SetPreference("Goal", 0)
-		preferencesConfig.SetPreference("Keys_Required", false)
-		preferencesConfig.SetPreference("Big_Keys_Required", false)
-		preferencesConfig.SetPreference("Bosses_Required", true)
-		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+		saveConfig.SetSave("Ganon Goal_Current", 7)
+		saveConfig.SetSave("Goal", 0)
+		saveConfig.SetSave("Maps_Required", true)
+		saveConfig.SetSave("Compasses_Required", true)
+		saveConfig.SetSave("Keys_Required", false)
+		saveConfig.SetSave("Big_Keys_Required", false)
+		saveConfig.SetSave("Bosses_Required", true)
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 	})
 	masterSwordItem := fyne.NewMenuItem("Master Sword Pedestal", func() {
-		//change ganon tower goal number to 7
-		preferencesConfig.SetPreference("Goal", 1)
-		preferencesConfig.SetPreference("Keys_Required", false)
-		preferencesConfig.SetPreference("Big_Keys_Required", false)
-		preferencesConfig.SetPreference("Bosses_Required", false)
-		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+		saveConfig.SetSave("Goal", 1)
+		saveConfig.SetSave("Maps_Required", false)
+		saveConfig.SetSave("Compasses_Required", false)
+		saveConfig.SetSave("Keys_Required", false)
+		saveConfig.SetSave("Big_Keys_Required", false)
+		saveConfig.SetSave("Bosses_Required", false)
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 	})
 	triforcePiecesItem := fyne.NewMenuItem("Triforce Pieces", func() {
-		//change ganon tower goal number to 7
-		preferencesConfig.SetPreference("Goal", 2)
-		preferencesConfig.SetPreference("Keys_Required", false)
-		preferencesConfig.SetPreference("Big_Keys_Required", false)
-		preferencesConfig.SetPreference("Bosses_Required", false)
-		preferencesConfig.SavePreferences()
-		inventory.PreferencesUpdate()
-		dungeon.PreferencesUpdate()
+		saveConfig.SetSave("Goal", 2)
+		saveConfig.SetSave("Maps_Required", false)
+		saveConfig.SetSave("Compasses_Required", false)
+		saveConfig.SetSave("Keys_Required", false)
+		saveConfig.SetSave("Big_Keys_Required", false)
+		saveConfig.SetSave("Bosses_Required", false)
+		inventory.ScreenUpdate()
+		dungeon.ScreenUpdate()
 	})
 	additionalOptionsItem := fyne.NewMenuItem("Additional Options", nil)
 	additionalOptionsItem.Action = func() {
@@ -353,6 +362,8 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
 	})
 	refreshItem.Icon = theme.ViewRefreshIcon()
 
+	defaultWindowSizeItem := fyne.NewMenuItem("Default Size", nil)
+	//defaultWindowSizeItem.Icon = theme.ZoomFitIcon()
 	defaultZoomItem := fyne.NewMenuItem("Default Zoom", nil)
 	defaultZoomItem.Icon = theme.ZoomFitIcon()
 	zoomInItem := fyne.NewMenuItem("Zoom In", nil)
@@ -379,7 +390,7 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
 	main := fyne.NewMainMenu(
 		options,
 		fyne.NewMenu("Edit", undoItem, redoItem, fyne.NewMenuItemSeparator(), refreshItem),
-		fyne.NewMenu("View" /*windowOnTopItem, */, defaultZoomItem, zoomInItem, zoomOutItem, fyne.NewMenuItemSeparator(), fullScreenItem),
+		fyne.NewMenu("View" /*windowOnTopItem, */, defaultWindowSizeItem, fyne.NewMenuItemSeparator(), defaultZoomItem, zoomInItem, zoomOutItem, fyne.NewMenuItemSeparator(), fullScreenItem),
 		helpMenu,
 	)
 
@@ -390,6 +401,10 @@ func MakeMenu(myApp fyne.App, mainWindow fyne.Window, undoStack *undo_redo.UndoR
 	}
 
 	fyneScaleInit(zoomInItem, zoomOutItem, defaultZoomItem)
+
+	defaultWindowSizeItem.Action = func() {
+		defaultWindowSize(mainWindow, inventory, dungeon)
+	}
 
 	defaultZoomItem.Action = func() {
 		defaultZoom(defaultZoomItem, main)

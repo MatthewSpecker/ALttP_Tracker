@@ -13,10 +13,10 @@ import (
 )
 
 type DungeonGrid struct {
+	hyruleCastle     *dungeonIcons
 	easternPalace    *dungeonIcons
 	desertPalace     *dungeonIcons
 	towerOfHera      *dungeonIcons
-	hyruleCastle     *dungeonIcons
 	castleTower      *dungeonIcons
 	palaceOfDarkness *dungeonIcons
 	swampPalace      *dungeonIcons
@@ -26,18 +26,24 @@ type DungeonGrid struct {
 	miseryMire       *dungeonIcons
 	turtleRock       *dungeonIcons
 	ganonsTower      *dungeonIcons
+	scale 			 float32
 	preferencesFile  *preferences.PreferencesFile
 	saveFile         *save.SaveFile
 	dungeonGrid      *fyne.Container
 }
 
-func NewDungeonGrid(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile) (*DungeonGrid, error) {
-	const scaleConstant = 3.0 / 5.0
+func NewDungeonGrid(scale float32, undoStack *undo_redo.UndoRedoStacks, preferencesConfig *preferences.PreferencesFile, saveConfig *save.SaveFile) (*DungeonGrid, error) {
+	scaleConstant := scale * 3.0 / 5.0
 
 	var err error
 	grid := &DungeonGrid{
+		scale:			 scale,
 		preferencesFile: preferencesConfig,
 		saveFile:        saveConfig,
+	}
+	grid.hyruleCastle, err = newDungeonIcons(undoStack, preferencesConfig, saveConfig, scaleConstant, "HC", false, false, -1, true, false, false, 1, 8)
+	if err != nil {
+		return nil, fmt.Errorf("Encountered error making hyruleCastle: %w", err)
 	}
 	grid.easternPalace, err = newDungeonIcons(undoStack, preferencesConfig, saveConfig, scaleConstant, "EP", true, true, 0, true, true, true, 0, 6)
 	if err != nil {
@@ -50,10 +56,6 @@ func NewDungeonGrid(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pref
 	grid.towerOfHera, err = newDungeonIcons(undoStack, preferencesConfig, saveConfig, scaleConstant, "TH", true, true, 2, true, true, true, 1, 6)
 	if err != nil {
 		return nil, fmt.Errorf("Encountered error making towerOfHera: %w", err)
-	}
-	grid.hyruleCastle, err = newDungeonIcons(undoStack, preferencesConfig, saveConfig, scaleConstant, "HC", false, false, -1, true, false, false, 1, 8)
-	if err != nil {
-		return nil, fmt.Errorf("Encountered error making hyruleCastle: %w", err)
 	}
 	grid.castleTower, err = newDungeonIcons(undoStack, preferencesConfig, saveConfig, scaleConstant, "CT", true, false, -1, false, false, false, 2, 2)
 	if err != nil {
@@ -101,24 +103,27 @@ func (d *DungeonGrid) Layout() *fyne.Container {
 	if d.preferencesFile.GetPreferenceBool("Chest_Count") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Maps") {
+	if d.preferencesFile.GetPreferenceBool("Maps") || d.saveFile.GetSaveBool("Maps_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Compasses") {
+	if d.preferencesFile.GetPreferenceBool("Compasses") || d.saveFile.GetSaveBool("Compasses_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Keys") || d.preferencesFile.GetPreferenceBool("Keys_Required") {
+	if d.preferencesFile.GetPreferenceBool("Keys") || d.saveFile.GetSaveBool("Keys_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.preferencesFile.GetPreferenceBool("Big_Keys_Required") {
+	if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.saveFile.GetSaveBool("Big_Keys_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Bosses") || d.preferencesFile.GetPreferenceBool("Bosses_Required") {
+	if d.preferencesFile.GetPreferenceBool("Bosses") || d.saveFile.GetSaveBool("Bosses_Required") {
 		gridCol++
 	}
 
 	d.dungeonGrid = container.New(layout.NewGridLayout(gridCol))
 
+	for _, element := range d.hyruleCastle.layout() {
+		d.dungeonGrid.Add(element)
+	}
 	for _, element := range d.easternPalace.layout() {
 		d.dungeonGrid.Add(element)
 	}
@@ -126,9 +131,6 @@ func (d *DungeonGrid) Layout() *fyne.Container {
 		d.dungeonGrid.Add(element)
 	}
 	for _, element := range d.towerOfHera.layout() {
-		d.dungeonGrid.Add(element)
-	}
-	for _, element := range d.hyruleCastle.layout() {
 		d.dungeonGrid.Add(element)
 	}
 	for _, element := range d.castleTower.layout() {
@@ -165,10 +167,10 @@ func (d *DungeonGrid) Layout() *fyne.Container {
 }
 
 func (d *DungeonGrid) saveUpdate() {
+	d.hyruleCastle.saveUpdate()
 	d.easternPalace.saveUpdate()
 	d.desertPalace.saveUpdate()
 	d.towerOfHera.saveUpdate()
-	d.hyruleCastle.saveUpdate()
 	d.castleTower.saveUpdate()
 	d.palaceOfDarkness.saveUpdate()
 	d.swampPalace.saveUpdate()
@@ -180,11 +182,11 @@ func (d *DungeonGrid) saveUpdate() {
 	d.ganonsTower.saveUpdate()
 }
 
-func (d *DungeonGrid) PreferencesUpdate() {
+func (d *DungeonGrid) ScreenUpdate() {
+	d.hyruleCastle.preferencesUpdate()
 	d.easternPalace.preferencesUpdate()
 	d.desertPalace.preferencesUpdate()
 	d.towerOfHera.preferencesUpdate()
-	d.hyruleCastle.preferencesUpdate()
 	d.castleTower.preferencesUpdate()
 	d.palaceOfDarkness.preferencesUpdate()
 	d.swampPalace.preferencesUpdate()
@@ -200,25 +202,28 @@ func (d *DungeonGrid) PreferencesUpdate() {
 	if d.preferencesFile.GetPreferenceBool("Chest_Count") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Maps") {
+	if d.preferencesFile.GetPreferenceBool("Maps") || d.saveFile.GetSaveBool("Maps_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Compasses") {
+	if d.preferencesFile.GetPreferenceBool("Compasses") || d.saveFile.GetSaveBool("Compasses_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Keys") || d.preferencesFile.GetPreferenceBool("Keys_Required") {
+	if d.preferencesFile.GetPreferenceBool("Keys") || d.saveFile.GetSaveBool("Keys_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.preferencesFile.GetPreferenceBool("Big_Keys_Required") {
+	if d.preferencesFile.GetPreferenceBool("Big_Keys") || d.saveFile.GetSaveBool("Big_Keys_Required") {
 		gridCol++
 	}
-	if d.preferencesFile.GetPreferenceBool("Bosses") || d.preferencesFile.GetPreferenceBool("Bosses_Required") {
+	if d.preferencesFile.GetPreferenceBool("Bosses") || d.saveFile.GetSaveBool("Bosses_Required") {
 		gridCol++
 	}
 
 	d.dungeonGrid.RemoveAll()
 	d.dungeonGrid.Layout = layout.NewGridLayout(gridCol)
 
+	for _, element := range d.hyruleCastle.DungeonRow {
+		d.dungeonGrid.Add(element)
+	}
 	for _, element := range d.easternPalace.DungeonRow {
 		d.dungeonGrid.Add(element)
 	}
@@ -226,9 +231,6 @@ func (d *DungeonGrid) PreferencesUpdate() {
 		d.dungeonGrid.Add(element)
 	}
 	for _, element := range d.towerOfHera.DungeonRow {
-		d.dungeonGrid.Add(element)
-	}
-	for _, element := range d.hyruleCastle.DungeonRow {
 		d.dungeonGrid.Add(element)
 	}
 	for _, element := range d.castleTower.DungeonRow {
@@ -260,11 +262,32 @@ func (d *DungeonGrid) PreferencesUpdate() {
 	}
 }
 
+func (d *DungeonGrid) CreateSaveDefaults() {
+	d.hyruleCastle.createSaveDefaults()
+	d.easternPalace.createSaveDefaults()
+	d.desertPalace.createSaveDefaults()
+	d.towerOfHera.createSaveDefaults()
+	d.castleTower.createSaveDefaults()
+	d.palaceOfDarkness.createSaveDefaults()
+	d.swampPalace.createSaveDefaults()
+	d.skullWoods.createSaveDefaults()
+	d.thievesTown.createSaveDefaults()
+	d.icePalace.createSaveDefaults()
+	d.miseryMire.createSaveDefaults()
+	d.turtleRock.createSaveDefaults()
+	d.ganonsTower.createSaveDefaults()
+	d.saveFile.SetDefault("Maps_Required", false)
+	d.saveFile.SetDefault("Compasses_Required", false)
+	d.saveFile.SetDefault("Keys_Required", false)
+	d.saveFile.SetDefault("Big_Keys_Required", false)
+	d.saveFile.SetDefault("Bosses_Required", false)
+}
+
 func (d *DungeonGrid) RestoreDefaults() {
+	d.hyruleCastle.restoreDefaults()
 	d.easternPalace.restoreDefaults()
 	d.desertPalace.restoreDefaults()
 	d.towerOfHera.restoreDefaults()
-	d.hyruleCastle.restoreDefaults()
 	d.castleTower.restoreDefaults()
 	d.palaceOfDarkness.restoreDefaults()
 	d.swampPalace.restoreDefaults()
@@ -274,4 +297,10 @@ func (d *DungeonGrid) RestoreDefaults() {
 	d.miseryMire.restoreDefaults()
 	d.turtleRock.restoreDefaults()
 	d.ganonsTower.restoreDefaults()
+	d.saveFile.SetSave("Maps_Required", false)
+	d.saveFile.SetSave("Compasses_Required", false)
+	d.saveFile.SetSave("Keys_Required", false)
+	d.saveFile.SetSave("Big_Keys_Required", false)
+	d.saveFile.SetSave("Bosses_Required", false)
+	d.ScreenUpdate()
 }

@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"fyne.io/fyne/v2"
+
 	"github.com/spf13/viper"
 )
 
@@ -12,12 +14,12 @@ type PreferencesFile struct {
 	config *viper.Viper
 }
 
-func NewPreferencesFile(preferencesFileDirectory string) *PreferencesFile {
+func NewPreferencesFile(preferencesFileDirectory string, mainWindow fyne.Window) *PreferencesFile {
 	preferences := &PreferencesFile{
 		config: loadPreferences(preferencesFileDirectory),
 	}
 
-	preferences.CreateDefaults()
+	preferences.CreateDefaults(mainWindow)
 
 	preferences.config.BindEnv("fyne_scale")
 
@@ -62,6 +64,15 @@ func (p *PreferencesFile) GetPreferenceBool(key string) bool {
 	return p.config.GetBool(key)
 }
 
+func (p *PreferencesFile) GetWindowSize() fyne.Size {
+	width := float32(p.config.GetFloat64("MainWindowSizeWidth"))
+	height := float32(p.config.GetFloat64("MainWindowSizeHeight"))
+
+	mainWindowSize := fyne.NewSize(width, height)
+
+	return mainWindowSize
+}
+
 func (p *PreferencesFile) SetPreference(key string, value interface{}) error {
 	switch value.(type) {
 	case bool, int, float64:
@@ -72,52 +83,61 @@ func (p *PreferencesFile) SetPreference(key string, value interface{}) error {
 	}
 }
 
-func (p *PreferencesFile) CreateDefaults() {
+func (p *PreferencesFile) SetWindowSize(mainWindow fyne.Window) {
+	p.config.Set("MainWindowSizeWidth", p.GetWindowSizeWidth(mainWindow))
+	p.config.Set("MainWindowSizeHeight", p.GetWindowSizeHeight(mainWindow))
+}
+
+func (p *PreferencesFile) GetWindowSizeWidth(mainWindow fyne.Window) float64 {
+	windowSize := mainWindow.Content().Size()
+	width, _ := windowSize.Components()
+	return float64(width)
+}
+
+func (p *PreferencesFile) GetWindowSizeHeight(mainWindow fyne.Window) float64 {
+	windowSize := mainWindow.Content().Size()
+	_, height := windowSize.Components()
+	return float64(height)
+}
+
+func (p *PreferencesFile) CreateDefaults(mainWindow fyne.Window) {
 	p.config.SetDefault("Big_Keys", false)
-	p.config.SetDefault("Big_Keys_Required", false)
 	p.config.SetDefault("Bombs", true)
 	p.config.SetDefault("Bosses", false)
-	p.config.SetDefault("Bosses_Required", false)
-	p.config.SetDefault("Bottle_Full", false)
-	p.config.SetDefault("Chest_Count", false)
+	p.config.SetDefault("Bottle_Full", true)
+	p.config.SetDefault("Chest_Count", true)
 	p.config.SetDefault("Compasses", false)
 	p.config.SetDefault("Fullscreen", false)
 	p.config.SetDefault("Fyne_Scale", 1.000000)
 	p.config.SetDefault("Global_Hotkeys", true)
-	p.config.SetDefault("Goal", 0)
 	p.config.SetDefault("Halfmagic", true)
 	p.config.SetDefault("Heart_Pieces", true)
 	p.config.SetDefault("Keys", false)
-	p.config.SetDefault("Keys_Required", false)
 	p.config.SetDefault("Mail", true)
+	p.config.SetDefault("MainWindowSizeWidth", p.GetWindowSizeWidth(mainWindow))
+	p.config.SetDefault("MainWindowSizeHeight", p.GetWindowSizeHeight(mainWindow))
 	p.config.SetDefault("Maps", false)
-	p.config.SetDefault("Progressive_Bows", true)
-	p.config.SetDefault("Pseudo_Boots", false)
 	p.config.SetDefault("Shield", true)
 	p.config.SetDefault("Sword", true)
 }
 
-func (p *PreferencesFile) RestoreDefaults() {
+func (p *PreferencesFile) RestoreDefaults(mainWindow fyne.Window) {
 	p.config.Set("Big_Keys", false)
-	p.config.Set("Big_Keys_Required", false)
 	p.config.Set("Bombs", true)
 	p.config.Set("Bosses", false)
-	p.config.Set("Bosses_Required", false)
-	p.config.Set("Bottle_Full", false)
-	p.config.Set("Chest_Count", false)
+	p.config.Set("Bottle_Full", true)
+	p.config.Set("Chest_Count", true)
 	p.config.Set("Compasses", false)
 	p.config.Set("Fullscreen", false)
 	p.config.Set("Fyne_Scale", 1.000000)
 	p.config.Set("Global_Hotkeys", true)
-	p.config.Set("Goal", 0)
 	p.config.Set("Halfmagic", true)
 	p.config.Set("Heart_Pieces", true)
 	p.config.Set("Keys", false)
-	p.config.Set("Keys_Required", false)
 	p.config.Set("Mail", true)
+	p.config.Set("MainWindowSizeWidth", p.GetWindowSizeWidth(mainWindow))
+	p.config.Set("MainWindowSizeHeight", p.GetWindowSizeHeight(mainWindow))
 	p.config.Set("Maps", false)
-	p.config.Set("Progressive_Bows", true)
-	p.config.Set("Pseudo_Boots", false)
 	p.config.Set("Shield", true)
 	p.config.Set("Sword", true)
 }

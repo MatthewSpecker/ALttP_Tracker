@@ -145,22 +145,22 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 
 func (d *dungeonIcons) calculateChestCount() int {
 	var mapInt, compassInt, keyInt, bigKeyInt int
-	if d.preferencesConfig.GetPreferenceBool("Maps") || d.mapBool == false {
+	if d.saveConfig.GetSaveBool("Maps_Required") || d.mapBool == false {
 		mapInt = 0
 	} else {
 		mapInt = 1
 	}
-	if d.preferencesConfig.GetPreferenceBool("Compasses") || d.compassBool == false {
+	if d.saveConfig.GetSaveBool("Compasses_Required") || d.compassBool == false {
 		compassInt = 0
 	} else {
 		compassInt = 1
 	}
-	if d.preferencesConfig.GetPreferenceBool("Keys") {
+	if d.saveConfig.GetSaveBool("Keys_Required") {
 		keyInt = 0
 	} else {
 		keyInt = 1
 	}
-	if d.preferencesConfig.GetPreferenceBool("Big_Keys") || d.bigKeyBool == false {
+	if d.saveConfig.GetSaveBool("Big_Keys_Required") || d.bigKeyBool == false {
 		bigKeyInt = 0
 	} else {
 		bigKeyInt = 1
@@ -252,6 +252,9 @@ func (d *dungeonIcons) saveUpdate() {
 
 func (d *dungeonIcons) preferencesUpdate() {
 	colCounter := 8
+	chestCount := d.calculateChestCount()
+	d.chestTapIcon.LogicUpdate(chestCount)
+
 	if d.prizeBool == false {
 		colCounter--
 	}
@@ -261,25 +264,25 @@ func (d *dungeonIcons) preferencesUpdate() {
 		d.chestTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesConfig.GetPreferenceBool("Maps") {
+	if d.preferencesConfig.GetPreferenceBool("Maps") || d.saveConfig.GetSaveBool("Maps_Required") {
 		d.mapTapContainer.Show()
 	} else {
 		d.mapTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesConfig.GetPreferenceBool("Compasses") {
+	if d.preferencesConfig.GetPreferenceBool("Compasses") || d.saveConfig.GetSaveBool("Compasses_Required") {
 		d.compassTapContainer.Show()
 	} else {
 		d.compassTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesConfig.GetPreferenceBool("Keys") || d.preferencesConfig.GetPreferenceBool("Keys_Required") {
+	if d.preferencesConfig.GetPreferenceBool("Keys") || d.saveConfig.GetSaveBool("Keys_Required") {
 		d.keyTapContainer.Show()
 	} else {
 		d.keyTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesConfig.GetPreferenceBool("Big_Keys") || d.preferencesConfig.GetPreferenceBool("Big_Keys_Required") {
+	if d.preferencesConfig.GetPreferenceBool("Big_Keys") || d.saveConfig.GetSaveBool("Big_Keys_Required") {
 		d.bigKeyTapContainer.Show()
 		if d.bigKeyBool == false {
 			colCounter--
@@ -288,7 +291,7 @@ func (d *dungeonIcons) preferencesUpdate() {
 		d.bigKeyTapContainer.Hide()
 		colCounter--
 	}
-	if d.preferencesConfig.GetPreferenceBool("Bosses") || d.preferencesConfig.GetPreferenceBool("Bosses_Required") {
+	if d.preferencesConfig.GetPreferenceBool("Bosses") || d.saveConfig.GetSaveBool("Bosses_Required") {
 		d.bossTapContainer.Show()
 		if d.bossBool == false {
 			colCounter--
