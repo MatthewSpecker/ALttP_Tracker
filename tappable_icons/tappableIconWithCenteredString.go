@@ -7,13 +7,10 @@ import (
 
 	"tracker/save"
 	"tracker/text_outline"
-	"tracker/tooltip"
 	"tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -21,7 +18,6 @@ import (
 
 type TappableIconWithCenteredString struct {
 	widget.Icon
-	desktop.Hoverable
 	resources      []fyne.Resource
 	current        int
 	maxValue       int
@@ -29,8 +25,6 @@ type TappableIconWithCenteredString struct {
 	obtained       bool
 	outlineText    *text_outline.TextOutline
 	tapSize        float32
-	toolTipText    string
-	toolTipPopUp   *widget.PopUp
 	undoRedoStacks *undo_redo.UndoRedoStacks
 	saveFile       *save.SaveFile
 	saveFileText   string
@@ -62,7 +56,6 @@ func NewTappableIconWithCenteredString(res []fyne.Resource, value int, size floa
 		saveFileText:   saveName,
 	}
 
-	icon.toolTipText = tooltip.GetToolTipText(icon.resources[0].Name())
 	icon.outlineText = text_outline.NewTextOutline(icon.text, icon.tapSize, 1.5, 6, color.White, color.Black)
 	icon.ExtendBaseWidget(icon)
 	icon.SetResource(icon.resources[0])
@@ -73,7 +66,6 @@ func NewTappableIconWithCenteredString(res []fyne.Resource, value int, size floa
 func (t *TappableIconWithCenteredString) Update() {
 	t.current = t.saveFile.GetSaveInt(t.saveFileText + "_Current")
 	t.current = intRangeCheck(t.current, t.maxValue, -1)
-	t.toolTipText = tooltip.GetToolTipText(t.resources[0].Name())
 	if t.current == -1 {
 		t.text = "?"
 	} else if t.current == 8 {
@@ -198,26 +190,4 @@ func (t *TappableIconWithCenteredString) TappedSecondary(_ *fyne.PointEvent) {
 func (t *TappableIconWithCenteredString) Keyed() {
 	t.undoRedoStacks.StoreFunctions(t.changeResource, t.changeResource)
 	t.changeResource()
-}
-
-func (t *TappableIconWithCenteredString) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableIconWithCenteredString(event, t.toolTipText, t)
-}
-
-func (t *TappableIconWithCenteredString) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableIconWithCenteredString) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableIconWithCenteredString(event *desktop.MouseEvent, text string, object *TappableIconWithCenteredString) *widget.PopUp {
-	toolTipText := canvas.NewText(text, color.White)
-	popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
-	var popUpPosition fyne.Position
-	popUpPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	popUpPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	popUp.ShowAtPosition(popUpPosition)
-
-	return popUp
 }

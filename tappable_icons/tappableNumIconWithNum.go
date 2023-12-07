@@ -11,7 +11,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -19,15 +18,12 @@ import (
 
 type TappableNumIconWithNum struct {
 	widget.Icon
-	desktop.Hoverable
 	text           *canvas.Text
 	number         int
 	numberMax      int
 	numberLabel    *widget.Label
 	ascending      bool
 	tapSize        float32
-	toolTipText    string
-	toolTipPopUp   *widget.PopUp
 	undoRedoStacks *undo_redo.UndoRedoStacks
 	saveFile       *save.SaveFile
 	saveFileText   string
@@ -52,7 +48,6 @@ func NewTappableNumIconWithNum(name string, num int, increase bool, size float32
 		numberMax:      num,
 		ascending:      increase,
 		tapSize:        size,
-		toolTipText:    name,
 		undoRedoStacks: undoRedo,
 		saveFile:       save,
 		saveFileText:   saveName,
@@ -210,26 +205,4 @@ func (t *TappableNumIconWithNum) Keyed() {
 		}
 		t.decrement()
 	}
-}
-
-func (t *TappableNumIconWithNum) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableNumIconWithNum(event, t.toolTipText, t)
-}
-
-func (t *TappableNumIconWithNum) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableNumIconWithNum) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableNumIconWithNum(event *desktop.MouseEvent, text string, object *TappableNumIconWithNum) *widget.PopUp {
-	toolTipText := canvas.NewText(text, color.White)
-	popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
-	var popUpPosition fyne.Position
-	popUpPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	popUpPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	popUp.ShowAtPosition(popUpPosition)
-
-	return popUp
 }

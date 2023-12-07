@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"tracker/display"
 	"tracker/dungeon"
 	"tracker/inventory"
 	//"tracker/keyboard"
@@ -11,16 +12,11 @@ import (
 	"tracker/save"
 	"tracker/undo_redo"
 
-	"fyne.io/fyne/v2"
+	//"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
+	//"fyne.io/fyne/v2/container"
 )
 
-func displayMainWindowContent(mainWindow fyne.Window, inventory *inventory.InventoryIcons, dungeon *dungeon.DungeonGrid) {
-	mainGrid := container.NewHBox(inventory.Layout(), dungeon.Layout())
-
-	mainWindow.SetContent(mainGrid)
-}
 
 func main() {
 	var scale float32 = 2.0
@@ -44,7 +40,7 @@ func main() {
 	mainMenu := menu.MakeMenu(myApp, mainWindow, undoStack, preferencesConfig, saveConfig, inventory, dungeon)
 	mainWindow.SetMainMenu(mainMenu)
 
-	displayMainWindowContent(mainWindow, inventory, dungeon)
+	display.DisplayMainWindowContent(mainWindow, inventory, dungeon)
 
 	mainWindow.SetFullScreen(preferencesConfig.GetPreferenceBool("Fullscreen"))
 	mainWindow.Resize(preferencesConfig.GetWindowSize())

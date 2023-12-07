@@ -6,13 +6,11 @@ import (
 	"strconv"
 
 	"tracker/save"
-	"tracker/tooltip"
 	"tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -20,28 +18,29 @@ import (
 
 type TappableNumIconWithIcon struct {
 	widget.Icon
-	desktop.Hoverable
 	text           *canvas.Text
 	resources      []fyne.Resource
 	current        int
-	iconSmall      *widget.Icon
+	iconSmall      *SizeableIcon
 	number         int
 	numberMax      int
 	ascending      bool
+	maxDigits	   int
 	tapSize        float32
-	toolTipText    string
-	toolTipPopUp   *widget.PopUp
 	undoRedoStacks *undo_redo.UndoRedoStacks
 	saveFile       *save.SaveFile
 	saveFileText   string
 }
 
-func NewTappableNumIconWithIcon(res []fyne.Resource, num int, increase bool, size float32, undoRedo *undo_redo.UndoRedoStacks, save *save.SaveFile, saveName string) (*TappableNumIconWithIcon, error) {
+func NewTappableNumIconWithIcon(res []fyne.Resource, num int, increase bool, digits int, size float32, undoRedo *undo_redo.UndoRedoStacks, save *save.SaveFile, saveName string) (*TappableNumIconWithIcon, error) {
 	if len(res) <= 1 {
 		return nil, errors.New("'res' must contain 2 or more resources")
 	}
 	if num < 0 {
 		return nil, errors.New("'num' must be a non-negative integer")
+	}
+	if digits < 1 || digits > 4 {
+		return nil, errors.New("'digits' must be a non-negative integer from 1 to 4")
 	}
 	if size <= 0 {
 		return nil, errors.New("'size' must be float32 greater than 0")
@@ -50,21 +49,31 @@ func NewTappableNumIconWithIcon(res []fyne.Resource, num int, increase bool, siz
 		return nil, errors.New("'saveName' cannot be empty string")
 	}
 
+	if digits == 1 {
+		digits = 99
+	} else if digits == 2 {
+		digits = 99
+	} else if digits == 3 {
+		digits = 999
+	} else {
+		digits = 9999
+	}
+
 	icon := &TappableNumIconWithIcon{
 		resources:      res,
 		current:        0,
 		number:         0,
 		numberMax:      num,
 		ascending:      increase,
+		maxDigits:		digits,
 		tapSize:        size,
 		undoRedoStacks: undoRedo,
 		saveFile:       save,
 		saveFileText:   saveName,
 	}
 
-	icon.iconSmall = widget.NewIcon(icon.resources[icon.current])
+	icon.iconSmall, _ = NewSizeableIcon(res, size)
 	icon.text = canvas.NewText(strconv.Itoa(icon.number), color.White)
-	icon.toolTipText = tooltip.GetToolTipText(icon.resources[icon.current].Name())
 
 	icon.text.TextStyle.Bold = true
 	icon.text.TextSize = size * theme.Padding() / 2.5
@@ -80,7 +89,6 @@ func NewTappableNumIconWithIcon(res []fyne.Resource, num int, increase bool, siz
 	icon.ExtendBaseWidget(icon)
 	resEmpty, _ := fyne.LoadResourceFromPath("")
 	icon.SetResource(resEmpty)
-	icon.iconSmall.Resize(icon.MinSize())
 
 	return icon, nil
 }
@@ -114,7 +122,7 @@ func (t *TappableNumIconWithIcon) Update() {
 		}
 	}
 
-	t.iconSmall.SetResource(t.resources[t.current])
+	t.iconSmall.Update(t.current)
 	t.text.Refresh()
 }
 
@@ -154,7 +162,7 @@ func (t *TappableNumIconWithIcon) LogicUpdate(num int) error {
 		}
 	}
 
-	t.iconSmall.SetResource(t.resources[t.current])
+	t.iconSmall.Update(t.current)
 	t.text.Refresh()
 
 	return nil
@@ -185,16 +193,15 @@ func (t *TappableNumIconWithIcon) Layout() *fyne.Container {
 }
 
 func (t *TappableNumIconWithIcon) layoutIcon() *fyne.Container {
+	t.text.Text = strconv.Itoa(t.maxDigits)
 	container1 := container.New(layout.NewCenterLayout(), t)
 	container2 := container.New(layout.NewCenterLayout(), t.text)
-	container3 := container.New(layout.NewMaxLayout(), t.iconSmall)
+	container3 := container.New(layout.NewCenterLayout(), t.iconSmall)
 	container4 := container.NewWithoutLayout(container3, container2, container1)
-	container3Size := container3.Size()
-	container3Resize := fyne.NewSize(container3Size.Width/1.5, container3Size.Height/1.5)
-	container3.Resize(container3Resize)
 	iconSize := t.text.Size()
 	iconChangePosition := fyne.NewPos(iconSize.Width/2, iconSize.Height/2)
 	container3.Move(iconChangePosition)
+	t.text.Text = strconv.Itoa(t.number)
 
 	return container4
 }
@@ -210,12 +217,12 @@ func (t *TappableNumIconWithIcon) increment() {
 		if t.number == t.numberMax && t.ascending == true {
 			t.text.Color = color.NRGBA{R: 0, G: 255, B: 0, A: 255}
 			t.current++
-			t.iconSmall.SetResource(t.resources[t.current])
+			t.iconSmall.Update(t.current)
 		}
 		if t.number == 1 && t.ascending == false {
 			t.text.Color = color.White
 			t.current--
-			t.iconSmall.SetResource(t.resources[t.current])
+			t.iconSmall.Update(t.current)
 		}
 		t.text.Refresh()
 	}
@@ -229,12 +236,12 @@ func (t *TappableNumIconWithIcon) decrement() {
 		if t.number == t.numberMax-1 && t.ascending == true {
 			t.text.Color = color.White
 			t.current--
-			t.iconSmall.SetResource(t.resources[t.current])
+			t.iconSmall.Update(t.current)
 		}
 		if t.number == 0 && t.ascending == false {
 			t.text.Color = color.NRGBA{R: 0, G: 255, B: 0, A: 255}
 			t.current++
-			t.iconSmall.SetResource(t.resources[t.current])
+			t.iconSmall.Update(t.current)
 		}
 		t.text.Refresh()
 	}
@@ -281,26 +288,4 @@ func (t *TappableNumIconWithIcon) Keyed() {
 		}
 		t.decrement()
 	}
-}
-
-func (t *TappableNumIconWithIcon) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableNumIconWithIcon(event, t.toolTipText, t)
-}
-
-func (t *TappableNumIconWithIcon) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableNumIconWithIcon) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableNumIconWithIcon(event *desktop.MouseEvent, text string, object *TappableNumIconWithIcon) *widget.PopUp {
-	toolTipText := canvas.NewText(text, color.White)
-	popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
-	var popUpPosition fyne.Position
-	popUpPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	popUpPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	popUp.ShowAtPosition(popUpPosition)
-
-	return popUp
 }

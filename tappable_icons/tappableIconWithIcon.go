@@ -2,16 +2,12 @@ package tappable_icons
 
 import (
 	"errors"
-	"image/color"
 
 	"tracker/save"
-	"tracker/tooltip"
 	"tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -19,14 +15,11 @@ import (
 
 type TappableIconWithIcon struct {
 	widget.Icon
-	desktop.Hoverable
 	resources      []fyne.Resource
 	current        int
 	smallResources []fyne.Resource
-	iconSmall      *widget.Icon
+	iconSmall      *SizeableIcon
 	tapSize        float32
-	toolTipText    string
-	toolTipPopUp   *widget.PopUp
 	undoRedoStacks *undo_redo.UndoRedoStacks
 	saveFile       *save.SaveFile
 	saveFileText   string
@@ -47,11 +40,13 @@ func NewTappableIconWithIcon(res []fyne.Resource, smallRes []fyne.Resource, size
 	}
 
 	resSmallEmpty, _ := fyne.LoadResourceFromPath("")
+	resSmallEmptySlice := []fyne.Resource{resSmallEmpty}
+	smallRes = append(resSmallEmptySlice, smallRes...)
+
 	icon := &TappableIconWithIcon{
 		resources:      res,
 		current:        0,
 		smallResources: smallRes,
-		iconSmall:      widget.NewIcon(resSmallEmpty),
 		tapSize:        size,
 		undoRedoStacks: undoRedo,
 		saveFile:       save,
@@ -59,8 +54,7 @@ func NewTappableIconWithIcon(res []fyne.Resource, smallRes []fyne.Resource, size
 	}
 
 	icon.ExtendBaseWidget(icon)
-	icon.iconSmall.SetResource(resSmallEmpty)
-	icon.toolTipText = tooltip.GetToolTipText(icon.resources[icon.current].Name())
+	icon.iconSmall, _ = NewSizeableIcon(smallRes, size)
 	icon.SetResource(icon.resources[icon.current])
 
 	return icon, nil
@@ -68,16 +62,13 @@ func NewTappableIconWithIcon(res []fyne.Resource, smallRes []fyne.Resource, size
 
 func (t *TappableIconWithIcon) Update() {
 	t.current = t.saveFile.GetSaveInt(t.saveFileText + "_Current")
-	t.current = intRangeCheck(t.current, len(t.smallResources)+len(t.resources)-1, 0)
+	t.current = intRangeCheck(t.current, len(t.smallResources)-1+len(t.resources)-1, 0)
 
 	if t.current > len(t.resources)-1 {
-		t.iconSmall.SetResource(t.smallResources[t.current-len(t.resources)])
-		t.toolTipText = tooltip.GetToolTipText(t.resources[len(t.resources)-1].Name())
+		t.iconSmall.Update(t.current-len(t.resources)+1)
 		t.SetResource(t.resources[len(t.resources)-1])
 	} else {
-		resSmallEmpty, _ := fyne.LoadResourceFromPath("")
-		t.iconSmall.SetResource(resSmallEmpty)
-		t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
+		t.iconSmall.Update(0)
 		t.SetResource(t.resources[t.current])
 	}
 }
@@ -114,13 +105,12 @@ func (t *TappableIconWithIcon) MinSize() fyne.Size {
 }
 
 func (t *TappableIconWithIcon) increment() {
-	if t.current < (len(t.resources) - 1) {
+	if t.current < (len(t.resources)-1) {
 		t.current++
-		t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 		t.Icon.SetResource(t.resources[t.current])
-	} else if t.current < len(t.smallResources)+len(t.resources)-1 {
+	} else if t.current < len(t.smallResources)-1+len(t.resources)-1 {
 		t.current++
-		t.iconSmall.SetResource(t.smallResources[t.current-len(t.resources)])
+		t.iconSmall.Update(t.current-len(t.resources)+1)
 	}
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
 }
@@ -128,14 +118,12 @@ func (t *TappableIconWithIcon) increment() {
 func (t *TappableIconWithIcon) decrement() {
 	if t.current > len(t.resources) {
 		t.current--
-		t.iconSmall.SetResource(t.smallResources[t.current-len(t.resources)])
+		t.iconSmall.Update(t.current-len(t.resources)+1)
 	} else if t.current == len(t.resources) {
 		t.current--
-		resSmall, _ := fyne.LoadResourceFromPath("")
-		t.iconSmall.SetResource(resSmall)
+		t.iconSmall.Update(0)
 	} else if t.current > 0 {
 		t.current--
-		t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 		t.Icon.SetResource(t.resources[t.current])
 	}
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
@@ -160,26 +148,4 @@ func (t *TappableIconWithIcon) Keyed() {
 		t.undoRedoStacks.StoreFunctions(t.decrement, t.increment)
 	}
 	t.increment()
-}
-
-func (t *TappableIconWithIcon) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableIconWithIcon(event, t.toolTipText, t)
-}
-
-func (t *TappableIconWithIcon) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableIconWithIcon) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableIconWithIcon(event *desktop.MouseEvent, text string, object *TappableIconWithIcon) *widget.PopUp {
-	toolTipText := canvas.NewText(text, color.White)
-	popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
-	var popUpPosition fyne.Position
-	popUpPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	popUpPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	popUp.ShowAtPosition(popUpPosition)
-
-	return popUp
 }

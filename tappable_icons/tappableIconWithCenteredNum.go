@@ -7,13 +7,10 @@ import (
 
 	"tracker/save"
 	"tracker/text_outline"
-	"tracker/tooltip"
 	"tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -21,7 +18,6 @@ import (
 
 type TappableIconWithCenteredNum struct {
 	widget.Icon
-	desktop.Hoverable
 	resources      []fyne.Resource
 	current        int
 	number         int
@@ -29,8 +25,6 @@ type TappableIconWithCenteredNum struct {
 	text           string
 	outlineText    *text_outline.TextOutline
 	tapSize        float32
-	toolTipText    string
-	toolTipPopUp   *widget.PopUp
 	undoRedoStacks *undo_redo.UndoRedoStacks
 	saveFile       *save.SaveFile
 	saveFileText   string
@@ -67,8 +61,7 @@ func NewTappableIconWithCenteredNum(res []fyne.Resource, num int, size float32, 
 		icon.text = strconv.Itoa(icon.number)
 	}
 
-	icon.toolTipText = tooltip.GetToolTipText(icon.resources[icon.current].Name())
-	icon.outlineText = text_outline.NewTextOutline(icon.text, icon.tapSize, 2, 6, color.White, color.Black)
+	icon.outlineText = text_outline.NewTextOutline(icon.text, icon.tapSize, 1.5, 6, color.White, color.Black)
 	icon.ExtendBaseWidget(icon)
 	icon.SetResource(icon.resources[icon.current])
 
@@ -80,7 +73,6 @@ func (t *TappableIconWithCenteredNum) Update() {
 	t.current = intRangeCheck(t.current, len(t.resources)-1, 0)
 	t.number = t.saveFile.GetSaveInt(t.saveFileText + "_Number")
 	t.number = intRangeCheck(t.number, t.numberMax, 0)
-	t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 	if t.number == 0 {
 		t.text = ""
 	} else {
@@ -131,7 +123,6 @@ func (t *TappableIconWithCenteredNum) MinSize() fyne.Size {
 func (t *TappableIconWithCenteredNum) increment() {
 	if t.current < (len(t.resources) - 1) {
 		t.current++
-		t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 		t.Icon.SetResource(t.resources[t.current])
 	}
 	if t.number < t.numberMax {
@@ -146,7 +137,6 @@ func (t *TappableIconWithCenteredNum) increment() {
 func (t *TappableIconWithCenteredNum) decrement() {
 	if t.current > 0 && t.number <= t.current {
 		t.current--
-		t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 		t.Icon.SetResource(t.resources[t.current])
 	}
 	if t.number == 1 {
@@ -181,26 +171,4 @@ func (t *TappableIconWithCenteredNum) Keyed() {
 		t.undoRedoStacks.StoreFunctions(t.decrement, t.increment)
 	}
 	t.increment()
-}
-
-func (t *TappableIconWithCenteredNum) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableIconWithCenteredNum(event, t.toolTipText, t)
-}
-
-func (t *TappableIconWithCenteredNum) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableIconWithCenteredNum) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableIconWithCenteredNum(event *desktop.MouseEvent, text string, object *TappableIconWithCenteredNum) *widget.PopUp {
-	toolTipText := canvas.NewText(text, color.White)
-	popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
-	var popUpPosition fyne.Position
-	popUpPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	popUpPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	popUp.ShowAtPosition(popUpPosition)
-
-	return popUp
 }

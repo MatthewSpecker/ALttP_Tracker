@@ -2,16 +2,12 @@ package tappable_icons
 
 import (
 	"errors"
-	"image/color"
 
 	"tracker/save"
-	"tracker/tooltip"
 	"tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -19,12 +15,9 @@ import (
 
 type TappableIconCycled struct {
 	widget.Icon
-	desktop.Hoverable
 	resources      []fyne.Resource
 	current        int
 	tapSize        float32
-	toolTipText    string
-	toolTipPopUp   *widget.PopUp
 	undoRedoStacks *undo_redo.UndoRedoStacks
 	saveFile       *save.SaveFile
 	saveFileText   string
@@ -50,7 +43,6 @@ func NewTappableIconCycled(res []fyne.Resource, size float32, undoRedo *undo_red
 		saveFileText:   saveName,
 	}
 
-	icon.toolTipText = tooltip.GetToolTipText(icon.resources[icon.current].Name())
 	icon.ExtendBaseWidget(icon)
 	icon.SetResource(icon.resources[icon.current])
 
@@ -60,7 +52,6 @@ func NewTappableIconCycled(res []fyne.Resource, size float32, undoRedo *undo_red
 func (t *TappableIconCycled) Update() {
 	t.current = t.saveFile.GetSaveInt(t.saveFileText + "_Current")
 	t.current = intRangeCheck(t.current, len(t.resources)-1, 0)
-	t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 
 	t.Icon.SetResource(t.resources[t.current])
 }
@@ -117,26 +108,4 @@ func (t *TappableIconCycled) TappedSecondary(_ *fyne.PointEvent) {
 func (t *TappableIconCycled) Keyed() {
 	t.undoRedoStacks.StoreFunctions(t.decrement, t.increment)
 	t.increment()
-}
-
-func (t *TappableIconCycled) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableIconCycled(event, t.toolTipText, t)
-}
-
-func (t *TappableIconCycled) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableIconCycled) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableIconCycled(event *desktop.MouseEvent, text string, object *TappableIconCycled) *widget.PopUp {
-	toolTipText := canvas.NewText(text, color.White)
-	popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
-	var popUpPosition fyne.Position
-	popUpPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	popUpPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	popUp.ShowAtPosition(popUpPosition)
-
-	return popUp
 }

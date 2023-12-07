@@ -2,16 +2,12 @@ package tappable_icons
 
 import (
 	"errors"
-	"image/color"
 
 	"tracker/save"
-	"tracker/tooltip"
 	"tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -19,15 +15,12 @@ import (
 
 type TappableBossIcon struct {
 	widget.Icon
-	desktop.Hoverable
 	resourcesGray   []fyne.Resource
 	resourcesBoss   []fyne.Resource
 	current         int
 	bossStart       int
 	passedPrizeIcon *TappablePrizeIcon
 	tapSize         float32
-	toolTipText     string
-	toolTipPopUp    *tooltip.ToolTip
 	undoRedoStacks  *undo_redo.UndoRedoStacks
 	saveFile        *save.SaveFile
 	saveFileText    string
@@ -56,7 +49,6 @@ func NewTappableBossIcon(bossNum int, size float32, prizeIcon *TappablePrizeIcon
 		saveFileText:    saveName + "_Boss",
 	}
 
-	icon.toolTipText = tooltip.GetToolTipText(icon.resourcesBoss[icon.current].Name())
 	icon.passedPrizeIcon.bossIcon = icon
 
 	icon.ExtendBaseWidget(icon)
@@ -72,7 +64,6 @@ func NewTappableBossIcon(bossNum int, size float32, prizeIcon *TappablePrizeIcon
 func (t *TappableBossIcon) Update() {
 	t.current = t.saveFile.GetSaveInt(t.saveFileText + "_Current")
 	t.current = intRangeCheck(t.current, len(t.resourcesBoss)-1, 0)
-	t.toolTipText = tooltip.GetToolTipText(t.resourcesBoss[t.current].Name())
 
 	if t.passedPrizeIcon.obtained {
 		t.Icon.SetResource(t.resourcesBoss[t.current])
@@ -111,7 +102,6 @@ func (t *TappableBossIcon) bossIncrement() {
 	} else {
 		t.Icon.SetResource(t.resourcesBoss[t.current])
 	}
-	t.toolTipText = tooltip.GetToolTipText(t.resourcesBoss[t.current].Name())
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
 }
 
@@ -126,7 +116,6 @@ func (t *TappableBossIcon) bossDecrement() {
 	} else {
 		t.Icon.SetResource(t.resourcesBoss[t.current])
 	}
-	t.toolTipText = tooltip.GetToolTipText(t.resourcesBoss[t.current].Name())
 	t.saveFile.SetSave(t.saveFileText+"_Current", t.current)
 }
 
@@ -151,26 +140,4 @@ func (t *TappableBossIcon) TappedSecondary(_ *fyne.PointEvent) {
 func (t *TappableBossIcon) Keyed() {
 	//t.undoRedoStacks.StoreFunctions(t.PrizeSet, t.PrizeSet)
 	//t.PrizeSet()
-}
-
-func (t *TappableBossIcon) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableBossIcon(event, t.toolTipText, t)
-}
-
-func (t *TappableBossIcon) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableBossIcon) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableBossIcon(event *desktop.MouseEvent, text string, object *TappableBossIcon) *tooltip.ToolTip {
-	toolTipText := canvas.NewText(text, color.White)
-	toolTip := tooltip.NewToolTip(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object), object.Tapped, object.TappedSecondary)
-	var toolTipPosition fyne.Position
-	toolTipPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	toolTipPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	toolTip.ShowAtPosition(toolTipPosition)
-
-	return toolTip
 }

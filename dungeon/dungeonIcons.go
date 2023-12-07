@@ -80,7 +80,9 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 	}
 
 	dungeon.nameText = canvas.NewText(name, color.White)
-	dungeon.nameText.Alignment = fyne.TextAlignTrailing
+	dungeon.nameText.TextStyle.Monospace = true
+	dungeon.nameText.TextSize = dungeon.nameText.TextSize * scaleConstant * 1.4
+	dungeon.nameText.Alignment = fyne.TextAlignCenter
 
 	if prizeBool && bossBool {
 		dungeon.prizeTapIcon, err = tappable_icons.NewTappablePrizeIcon(18*scaleConstant, undoStack, saveConfig, name)
@@ -102,7 +104,7 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 	}
 
 	chestCount := dungeon.calculateChestCount()
-	dungeon.chestTapIcon, err = tappable_icons.NewTappableNumIconWithIcon([]fyne.Resource{resourceChestPng, resourceEmptyChestPng}, chestCount, false, 16*scaleConstant, undoStack, saveConfig, name+"_Chest")
+	dungeon.chestTapIcon, err = tappable_icons.NewTappableNumIconWithIcon([]fyne.Resource{resourceChestPng, resourceEmptyChestPng}, chestCount, false, 2, 16*scaleConstant, undoStack, saveConfig, name+"_Chest")
 	if err != nil {
 		return nil, fmt.Errorf("Encountered error making chestTapIcon: %w", err)
 	}
@@ -121,7 +123,7 @@ func newDungeonIcons(undoStack *undo_redo.UndoRedoStacks, preferencesConfig *pre
 		}
 	}
 
-	dungeon.keyTapIcon, err = tappable_icons.NewTappableNumIconWithIcon([]fyne.Resource{resourceKeyPng, resourceKeyPng}, keys, true, 16*scaleConstant, undoStack, saveConfig, name+"_Keys")
+	dungeon.keyTapIcon, err = tappable_icons.NewTappableNumIconWithIcon([]fyne.Resource{resourceKeyPng, resourceKeyPng}, keys, true, 1, 16*scaleConstant, undoStack, saveConfig, name+"_Keys")
 	if err != nil {
 		return nil, fmt.Errorf("Encountered error making kepsTapIcon: %w", err)
 	}
@@ -173,7 +175,8 @@ func (d *dungeonIcons) calculateChestCount() int {
 func (d *dungeonIcons) layout() []*fyne.Container {
 	d.DungeonRow = []*fyne.Container{}
 
-	d.nameTextContainer = container.New(layout.NewMaxLayout(), d.nameText)
+	d.nameTextContainer = container.New(layout.NewCenterLayout(), d.nameText)
+	//container1 := container.New(layout.NewCenterLayout(), d.nameTextContainer)
 
 	d.DungeonRow = append(d.DungeonRow, d.nameTextContainer)
 

@@ -2,17 +2,13 @@ package tappable_icons
 
 import (
 	"errors"
-	"image/color"
 	"strconv"
 
 	"tracker/save"
-	"tracker/tooltip"
 	"tracker/undo_redo"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -20,15 +16,12 @@ import (
 
 type TappableIconWithNum struct {
 	widget.Icon
-	desktop.Hoverable
 	resources      []fyne.Resource
 	current        int
 	number         int
 	numberMax      int
 	numberLabel    *widget.Label
 	tapSize        float32
-	toolTipText    string
-	toolTipPopUp   *widget.PopUp
 	undoRedoStacks *undo_redo.UndoRedoStacks
 	saveFile       *save.SaveFile
 	saveFileText   string
@@ -60,7 +53,6 @@ func NewTappableIconWithNum(res []fyne.Resource, num int, size float32, undoRedo
 	}
 
 	icon.numberLabel = widget.NewLabel("")
-	icon.toolTipText = tooltip.GetToolTipText(icon.resources[icon.current].Name())
 	icon.ExtendBaseWidget(icon)
 	icon.SetResource(icon.resources[icon.current])
 
@@ -72,7 +64,6 @@ func (t *TappableIconWithNum) Update() {
 	t.current = intRangeCheck(t.current, len(t.resources)-1, 0)
 	t.number = t.saveFile.GetSaveInt(t.saveFileText + "_Number")
 	t.number = intRangeCheck(t.number, t.numberMax, 0)
-	t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 
 	if t.number == 0 {
 		t.numberLabel.SetText("")
@@ -119,7 +110,6 @@ func (t *TappableIconWithNum) MinSize() fyne.Size {
 func (t *TappableIconWithNum) increment() {
 	if t.current < (len(t.resources) - 1) {
 		t.current++
-		t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 		t.Icon.SetResource(t.resources[t.current])
 	}
 	if t.number < t.numberMax {
@@ -133,7 +123,6 @@ func (t *TappableIconWithNum) increment() {
 func (t *TappableIconWithNum) decrement() {
 	if t.current > 0 && t.number <= t.current {
 		t.current--
-		t.toolTipText = tooltip.GetToolTipText(t.resources[t.current].Name())
 		t.Icon.SetResource(t.resources[t.current])
 	}
 	if t.number == 1 {
@@ -166,26 +155,4 @@ func (t *TappableIconWithNum) Keyed() {
 		t.undoRedoStacks.StoreFunctions(t.decrement, t.increment)
 	}
 	t.increment()
-}
-
-func (t *TappableIconWithNum) MouseIn(event *desktop.MouseEvent) {
-	//t.toolTipPopUp = newToolTipTextTappableIconWithNum(event, t.toolTipText, t)
-}
-
-func (t *TappableIconWithNum) MouseMoved(_ *desktop.MouseEvent) {
-}
-
-func (t *TappableIconWithNum) MouseOut() {
-	//t.toolTipPopUp.Hide()
-}
-
-func newToolTipTextTappableIconWithNum(event *desktop.MouseEvent, text string, object *TappableIconWithNum) *widget.PopUp {
-	toolTipText := canvas.NewText(text, color.White)
-	popUp := widget.NewPopUp(toolTipText, fyne.CurrentApp().Driver().CanvasForObject(object))
-	var popUpPosition fyne.Position
-	popUpPosition.X = event.AbsolutePosition.X + object.Size().Width/2
-	popUpPosition.Y = event.AbsolutePosition.Y - object.Size().Height/2
-	popUp.ShowAtPosition(popUpPosition)
-
-	return popUp
 }
